@@ -39,7 +39,7 @@ export function toReactFlowGraph(response: GraphResponse): {
     id: n.id,
     type: n.kind.toLowerCase(),
     position: { x: 0, y: 0 },
-    data: n,
+    data: n as unknown as Record<string, unknown>,
   }))
 
   const edges: RFEdge[] = response.edges.map((e) => ({

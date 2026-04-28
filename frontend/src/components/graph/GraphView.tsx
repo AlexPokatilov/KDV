@@ -5,6 +5,8 @@ import {
   ReactFlow,
   useEdgesState,
   useNodesState,
+  type Edge as RFEdge,
+  type Node as RFNode,
   type NodeTypes,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
@@ -32,8 +34,8 @@ export function GraphView() {
   const { selectedNamespace, selectedNodeId, setSelectedNode } = useUIStore()
   const { data, isLoading, isError, error } = useGraphQuery(selectedNamespace)
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<RFNode>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<RFEdge>([])
 
   useEffect(() => {
     if (data) {
