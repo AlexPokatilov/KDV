@@ -1,0 +1,12 @@
+apiVersion: v2
+name: kdv
+description: Kubernetes Dependency Viewer — visualize K8s resource relationships
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - kubernetes
+  - visualization
+  - dependencies
+maintainers:
+  - name: KDV

@@ -1,0 +1,17 @@
+{{- if and .Values.rbac.create (not .Values.rbac.clusterScoped) -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "kdv.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "kdv.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "kdv.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kdv.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
