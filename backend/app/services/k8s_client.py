@@ -45,6 +45,9 @@ class KubernetesClient:
     def list_statefulsets(self, namespace: str):
         return self._apps.list_namespaced_stateful_set(namespace=namespace).items
 
+    def list_daemonsets(self, namespace: str):
+        return self._apps.list_namespaced_daemon_set(namespace=namespace).items
+
     def list_configmaps(self, namespace: str):
         return self._core.list_namespaced_config_map(namespace=namespace).items
 

@@ -8,6 +8,7 @@ class ResourceKind(str, Enum):
     Pod = "Pod"
     Deployment = "Deployment"
     StatefulSet = "StatefulSet"
+    DaemonSet = "DaemonSet"
     Service = "Service"
     Ingress = "Ingress"
     ConfigMap = "ConfigMap"

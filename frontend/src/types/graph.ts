@@ -2,6 +2,7 @@ export type ResourceKind =
   | 'Pod'
   | 'Deployment'
   | 'StatefulSet'
+  | 'DaemonSet'
   | 'Service'
   | 'Ingress'
   | 'ConfigMap'

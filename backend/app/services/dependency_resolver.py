@@ -93,6 +93,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
     pods = k8s.list_pods(namespace)
     deployments = k8s.list_deployments(namespace)
     statefulsets = k8s.list_statefulsets(namespace)
+    daemonsets = k8s.list_daemonsets(namespace)
     services = k8s.list_services(namespace)
     ingresses = k8s.list_ingresses(namespace)
     configmaps = k8s.list_configmaps(namespace)
@@ -167,6 +168,28 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
         for pod in pods:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(sts_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
+
+    # ─── DaemonSets → Pods ────────────────────────────
+    for ds in daemonsets:
+        selector = {}
+        if ds.spec.selector and ds.spec.selector.match_labels:
+            selector = ds.spec.selector.match_labels
+        ready = ds.status.number_ready or 0
+        desired = ds.status.desired_number_scheduled or 0
+        ds_id = _node_id("DaemonSet", namespace, ds.metadata.name)
+        nodes.append(GraphNode(
+            id=ds_id,
+            kind=ResourceKind.DaemonSet,
+            name=ds.metadata.name,
+            namespace=namespace,
+            labels=ds.metadata.labels or {},
+            status=f"{ready}/{desired}",
+            replicas=desired,
+            selector=selector,
+        ))
+        for pod in pods:
+            if _labels_match(selector, pod.metadata.labels or {}):
+                add_edge(ds_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
     # ─── Services → Pods ──────────────────────────────
     service_by_name: dict[str, str] = {}

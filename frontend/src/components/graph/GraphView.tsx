@@ -15,10 +15,12 @@ import { useGraphQuery } from '../../api/graph'
 import { useUIStore } from '../../store/uiStore'
 import type { GraphNode } from '../../types/graph'
 import { filterByKinds, toReactFlowGraph } from '../../utils/graphTransform'
+import { KIND_COLORS } from '../../utils/kindMeta'
 import { ErrorBanner } from '../common/ErrorBanner'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { NodeDetailPanel } from './NodeDetailPanel'
 import { ConfigMapNode } from './nodes/ConfigMapNode'
+import { DaemonSetNode } from './nodes/DaemonSetNode'
 import { DeploymentNode } from './nodes/DeploymentNode'
 import { IngressNode } from './nodes/IngressNode'
 import { PodNode } from './nodes/PodNode'
@@ -30,6 +32,7 @@ const nodeTypes: NodeTypes = {
   pod: PodNode,
   deployment: DeploymentNode,
   statefulset: StatefulSetNode,
+  daemonset: DaemonSetNode,
   service: ServiceNode,
   ingress: IngressNode,
   configmap: ConfigMapNode,
@@ -86,15 +89,8 @@ export function GraphView() {
         <Controls />
         <MiniMap
           nodeColor={(n) => {
-            const kind = (n.data as unknown as GraphNode)?.kind?.toLowerCase()
-            if (kind === 'pod') return '#22c55e'
-            if (kind === 'deployment') return '#3b82f6'
-            if (kind === 'statefulset') return '#06b6d4'
-            if (kind === 'service') return '#f59e0b'
-            if (kind === 'ingress') return '#8b5cf6'
-            if (kind === 'configmap') return '#ec4899'
-            if (kind === 'secret') return '#f43f5e'
-            return '#64748b'
+            const kind = (n.data as unknown as GraphNode)?.kind
+            return (kind && KIND_COLORS[kind]) || '#64748b'
           }}
           maskColor="rgba(15,23,42,0.7)"
         />
