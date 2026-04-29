@@ -1,4 +1,11 @@
-export type ResourceKind = 'Pod' | 'Deployment' | 'Service' | 'Ingress'
+export type ResourceKind =
+  | 'Pod'
+  | 'Deployment'
+  | 'StatefulSet'
+  | 'Service'
+  | 'Ingress'
+  | 'ConfigMap'
+  | 'Secret'
 export type ViewType = 'graph' | 'mindmap' | 'tree'
 
 export interface GraphNode {
@@ -16,7 +23,7 @@ export interface GraphEdge {
   id: string
   source: string
   target: string
-  relation: 'selects' | 'routes-to'
+  relation: 'selects' | 'routes-to' | 'uses-config' | 'uses-secret' | 'uses-tls'
 }
 
 export interface GraphResponse {

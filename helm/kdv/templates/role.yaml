@@ -8,10 +8,10 @@ metadata:
     {{- include "kdv.labels" . | nindent 4 }}
 rules:
   - apiGroups: [""]
-    resources: ["pods", "services"]
+    resources: ["pods", "services", "configmaps", "secrets"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["apps"]
-    resources: ["deployments"]
+    resources: ["deployments", "statefulsets"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]

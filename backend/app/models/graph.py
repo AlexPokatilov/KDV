@@ -7,8 +7,11 @@ from pydantic import BaseModel
 class ResourceKind(str, Enum):
     Pod = "Pod"
     Deployment = "Deployment"
+    StatefulSet = "StatefulSet"
     Service = "Service"
     Ingress = "Ingress"
+    ConfigMap = "ConfigMap"
+    Secret = "Secret"
 
 
 class GraphNode(BaseModel):

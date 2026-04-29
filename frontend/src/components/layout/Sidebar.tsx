@@ -55,9 +55,12 @@ export function Sidebar() {
         <span className="sidebar__label">Legend</span>
         {[
           { color: '#3b82f6', label: 'Deployment' },
+          { color: '#06b6d4', label: 'StatefulSet' },
           { color: '#22c55e', label: 'Pod' },
           { color: '#f59e0b', label: 'Service' },
           { color: '#8b5cf6', label: 'Ingress' },
+          { color: '#ec4899', label: 'ConfigMap' },
+          { color: '#f43f5e', label: 'Secret' },
         ].map(({ color, label }) => (
           <div key={label} className="legend-item">
             <span className="legend-dot" style={{ background: color }} />

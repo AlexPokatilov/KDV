@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import Optional
 
 from app.models.graph import GraphEdge, GraphNode, GraphResponse, ResourceKind
 from app.services.k8s_client import KubernetesClient
@@ -26,11 +25,70 @@ def _pod_status(pod) -> str:
     return phase
 
 
+def _pod_configmap_refs(pod) -> set[str]:
+    refs: set[str] = set()
+    spec = pod.spec
+    if not spec:
+        return refs
+
+    for vol in (spec.volumes or []):
+        if vol.config_map and vol.config_map.name:
+            refs.add(vol.config_map.name)
+        if vol.projected and vol.projected.sources:
+            for src in vol.projected.sources:
+                if src.config_map and src.config_map.name:
+                    refs.add(src.config_map.name)
+
+    all_containers = list(spec.containers or []) + list(spec.init_containers or [])
+    for c in all_containers:
+        for env in (c.env or []):
+            vf = env.value_from
+            if vf and vf.config_map_key_ref and vf.config_map_key_ref.name:
+                refs.add(vf.config_map_key_ref.name)
+        for ef in (c.env_from or []):
+            if ef.config_map_ref and ef.config_map_ref.name:
+                refs.add(ef.config_map_ref.name)
+    return refs
+
+
+def _pod_secret_refs(pod) -> set[str]:
+    refs: set[str] = set()
+    spec = pod.spec
+    if not spec:
+        return refs
+
+    for s in (spec.image_pull_secrets or []):
+        if s.name:
+            refs.add(s.name)
+
+    for vol in (spec.volumes or []):
+        if vol.secret and vol.secret.secret_name:
+            refs.add(vol.secret.secret_name)
+        if vol.projected and vol.projected.sources:
+            for src in vol.projected.sources:
+                if src.secret and src.secret.name:
+                    refs.add(src.secret.name)
+
+    all_containers = list(spec.containers or []) + list(spec.init_containers or [])
+    for c in all_containers:
+        for env in (c.env or []):
+            vf = env.value_from
+            if vf and vf.secret_key_ref and vf.secret_key_ref.name:
+                refs.add(vf.secret_key_ref.name)
+        for ef in (c.env_from or []):
+            if ef.secret_ref and ef.secret_ref.name:
+                refs.add(ef.secret_ref.name)
+    return refs
+
+
 def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
     pods = k8s.list_pods(namespace)
     deployments = k8s.list_deployments(namespace)
+    statefulsets = k8s.list_statefulsets(namespace)
     services = k8s.list_services(namespace)
     ingresses = k8s.list_ingresses(namespace)
+    configmaps = k8s.list_configmaps(namespace)
+    secrets = k8s.list_secrets(namespace)
 
     nodes: list[GraphNode] = []
     edges: list[GraphEdge] = []
@@ -47,6 +105,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
                 relation=relation,
             ))
 
+    # ─── Pods ─────────────────────────────────────────
     for pod in pods:
         nodes.append(GraphNode(
             id=_node_id("Pod", namespace, pod.metadata.name),
@@ -57,14 +116,16 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             status=_pod_status(pod),
         ))
 
+    # ─── Deployments → Pods ───────────────────────────
     for dep in deployments:
         selector = {}
         if dep.spec.selector and dep.spec.selector.match_labels:
             selector = dep.spec.selector.match_labels
         ready = dep.status.ready_replicas or 0
         desired = dep.spec.replicas or 0
+        dep_id = _node_id("Deployment", namespace, dep.metadata.name)
         nodes.append(GraphNode(
-            id=_node_id("Deployment", namespace, dep.metadata.name),
+            id=dep_id,
             kind=ResourceKind.Deployment,
             name=dep.metadata.name,
             namespace=namespace,
@@ -73,11 +134,33 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             replicas=desired,
             selector=selector,
         ))
-        dep_id = _node_id("Deployment", namespace, dep.metadata.name)
         for pod in pods:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(dep_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
+    # ─── StatefulSets → Pods ──────────────────────────
+    for sts in statefulsets:
+        selector = {}
+        if sts.spec.selector and sts.spec.selector.match_labels:
+            selector = sts.spec.selector.match_labels
+        ready = sts.status.ready_replicas or 0
+        desired = sts.spec.replicas or 0
+        sts_id = _node_id("StatefulSet", namespace, sts.metadata.name)
+        nodes.append(GraphNode(
+            id=sts_id,
+            kind=ResourceKind.StatefulSet,
+            name=sts.metadata.name,
+            namespace=namespace,
+            labels=sts.metadata.labels or {},
+            status=f"{ready}/{desired}",
+            replicas=desired,
+            selector=selector,
+        ))
+        for pod in pods:
+            if _labels_match(selector, pod.metadata.labels or {}):
+                add_edge(sts_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
+
+    # ─── Services → Pods ──────────────────────────────
     service_by_name: dict[str, str] = {}
     for svc in services:
         selector = svc.spec.selector or {}
@@ -95,6 +178,44 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(svc_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
+    # ─── ConfigMaps ───────────────────────────────────
+    configmap_by_name: dict[str, str] = {}
+    for cm in configmaps:
+        cm_id = _node_id("ConfigMap", namespace, cm.metadata.name)
+        configmap_by_name[cm.metadata.name] = cm_id
+        nodes.append(GraphNode(
+            id=cm_id,
+            kind=ResourceKind.ConfigMap,
+            name=cm.metadata.name,
+            namespace=namespace,
+            labels=cm.metadata.labels or {},
+        ))
+
+    # ─── Secrets ──────────────────────────────────────
+    secret_by_name: dict[str, str] = {}
+    for sec in secrets:
+        sec_id = _node_id("Secret", namespace, sec.metadata.name)
+        secret_by_name[sec.metadata.name] = sec_id
+        nodes.append(GraphNode(
+            id=sec_id,
+            kind=ResourceKind.Secret,
+            name=sec.metadata.name,
+            namespace=namespace,
+            labels=sec.metadata.labels or {},
+            status=sec.type,
+        ))
+
+    # ─── Pods → ConfigMap / Secret ────────────────────
+    for pod in pods:
+        pod_id = _node_id("Pod", namespace, pod.metadata.name)
+        for cm_name in _pod_configmap_refs(pod):
+            if cm_name in configmap_by_name:
+                add_edge(pod_id, configmap_by_name[cm_name], "uses-config")
+        for sec_name in _pod_secret_refs(pod):
+            if sec_name in secret_by_name:
+                add_edge(pod_id, secret_by_name[sec_name], "uses-secret")
+
+    # ─── Ingresses → Services + Ingresses → Secret (TLS) ──
     for ing in ingresses:
         ing_id = _node_id("Ingress", namespace, ing.metadata.name)
         nodes.append(GraphNode(
@@ -104,12 +225,10 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             namespace=namespace,
             labels=ing.metadata.labels or {},
         ))
-        # Default backend
         if ing.spec.default_backend and ing.spec.default_backend.service:
             svc_name = ing.spec.default_backend.service.name
             if svc_name in service_by_name:
                 add_edge(ing_id, service_by_name[svc_name], "routes-to")
-        # Rules
         for rule in (ing.spec.rules or []):
             if not rule.http:
                 continue
@@ -118,6 +237,9 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
                     svc_name = path.backend.service.name
                     if svc_name in service_by_name:
                         add_edge(ing_id, service_by_name[svc_name], "routes-to")
+        for tls in (ing.spec.tls or []):
+            if tls.secret_name and tls.secret_name in secret_by_name:
+                add_edge(ing_id, secret_by_name[tls.secret_name], "uses-tls")
 
     return GraphResponse(
         namespace=namespace,

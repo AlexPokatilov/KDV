@@ -41,3 +41,12 @@ class KubernetesClient:
 
     def list_ingresses(self, namespace: str):
         return self._networking.list_namespaced_ingress(namespace=namespace).items
+
+    def list_statefulsets(self, namespace: str):
+        return self._apps.list_namespaced_stateful_set(namespace=namespace).items
+
+    def list_configmaps(self, namespace: str):
+        return self._core.list_namespaced_config_map(namespace=namespace).items
+
+    def list_secrets(self, namespace: str):
+        return self._core.list_namespaced_secret(namespace=namespace).items
