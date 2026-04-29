@@ -1,8 +1,63 @@
-import type { GraphNode } from '../../types/graph'
+import type { GraphNode, IngressRule, ServicePort } from '../../types/graph'
 import { useUIStore } from '../../store/uiStore'
 
 interface Props {
   node: GraphNode
+}
+
+function PortsSection({ ports }: { ports: ServicePort[] }) {
+  return (
+    <div className="detail-panel__section">
+      <div className="detail-panel__section-title">Ports</div>
+      <table className="ports-table">
+        <thead>
+          <tr>
+            <th>port</th>
+            <th>targetPort</th>
+            <th>proto</th>
+            {ports.some((p) => p.name) && <th>name</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {ports.map((p, i) => (
+            <tr key={i}>
+              <td>{p.port}</td>
+              <td>{p.target_port ?? '—'}</td>
+              <td>{p.protocol}</td>
+              {ports.some((pp) => pp.name) && <td>{p.name ?? '—'}</td>}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+function IngressRulesSection({ rules }: { rules: IngressRule[] }) {
+  return (
+    <div className="detail-panel__section">
+      <div className="detail-panel__section-title">Routes</div>
+      <div className="ingress-rules">
+        {rules.map((r, i) => (
+          <div key={i} className="ingress-rule">
+            <div className="ingress-rule__path">
+              {r.host ? (
+                <span className="ingress-rule__host">{r.host}</span>
+              ) : null}
+              <span className="ingress-rule__pathval">{r.path}</span>
+            </div>
+            <div className="ingress-rule__backend">
+              <span className="ingress-rule__arrow">→</span>
+              <span className="ingress-rule__svc">{r.service_name}</span>
+              {r.service_port && (
+                <span className="ingress-rule__port">:{r.service_port}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export function NodeDetailPanel({ node }: Props) {
@@ -34,6 +89,12 @@ export function NodeDetailPanel({ node }: Props) {
           <span className="detail-panel__label">replicas</span>
           <span>{node.replicas}</span>
         </div>
+      )}
+      {node.ports && node.ports.length > 0 && (
+        <PortsSection ports={node.ports} />
+      )}
+      {node.ingress_rules && node.ingress_rules.length > 0 && (
+        <IngressRulesSection rules={node.ingress_rules} />
       )}
       {Object.keys(node.labels).length > 0 && (
         <div className="detail-panel__section">

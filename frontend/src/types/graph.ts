@@ -8,6 +8,20 @@ export type ResourceKind =
   | 'Secret'
 export type ViewType = 'graph' | 'mindmap' | 'tree'
 
+export interface ServicePort {
+  name?: string
+  port: number
+  target_port?: string
+  protocol: string
+}
+
+export interface IngressRule {
+  host?: string
+  path: string
+  service_name: string
+  service_port?: string
+}
+
 export interface GraphNode {
   id: string
   kind: ResourceKind
@@ -17,6 +31,8 @@ export interface GraphNode {
   status?: string
   replicas?: number
   selector?: Record<string, string>
+  ports?: ServicePort[]
+  ingress_rules?: IngressRule[]
 }
 
 export interface GraphEdge {

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from app.models.graph import GraphEdge, GraphNode, GraphResponse, ResourceKind
+from app.models.graph import GraphEdge, GraphNode, GraphResponse, IngressRule, ResourceKind, ServicePort
 from app.services.k8s_client import KubernetesClient
 
 
@@ -23,6 +23,14 @@ def _pod_status(pod) -> str:
             if cond.type == "Ready" and cond.status == "False":
                 return "NotReady"
     return phase
+
+
+def _ingress_port(port_spec) -> str | None:
+    if port_spec is None:
+        return None
+    if port_spec.number:
+        return str(port_spec.number)
+    return port_spec.name or None
 
 
 def _pod_configmap_refs(pod) -> set[str]:
@@ -166,6 +174,15 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
         selector = svc.spec.selector or {}
         svc_id = _node_id("Service", namespace, svc.metadata.name)
         service_by_name[svc.metadata.name] = svc_id
+        svc_ports = [
+            ServicePort(
+                name=p.name,
+                port=p.port,
+                target_port=str(p.target_port) if p.target_port is not None else None,
+                protocol=p.protocol or "TCP",
+            )
+            for p in (svc.spec.ports or [])
+        ]
         nodes.append(GraphNode(
             id=svc_id,
             kind=ResourceKind.Service,
@@ -173,6 +190,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             namespace=namespace,
             labels=svc.metadata.labels or {},
             selector=selector,
+            ports=svc_ports or None,
         ))
         for pod in pods:
             if _labels_match(selector, pod.metadata.labels or {}):
@@ -218,25 +236,44 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
     # ─── Ingresses → Services + Ingresses → Secret (TLS) ──
     for ing in ingresses:
         ing_id = _node_id("Ingress", namespace, ing.metadata.name)
+        ing_rules: list[IngressRule] = []
+
+        if ing.spec.default_backend and ing.spec.default_backend.service:
+            db_svc = ing.spec.default_backend.service
+            port_val = _ingress_port(db_svc.port)
+            ing_rules.append(IngressRule(
+                path="/ (default backend)",
+                service_name=db_svc.name,
+                service_port=port_val,
+            ))
+            if db_svc.name in service_by_name:
+                add_edge(ing_id, service_by_name[db_svc.name], "routes-to")
+
+        for rule in (ing.spec.rules or []):
+            if not rule.http:
+                continue
+            for path in (rule.http.paths or []):
+                if path.backend and path.backend.service:
+                    svc = path.backend.service
+                    port_val = _ingress_port(svc.port)
+                    ing_rules.append(IngressRule(
+                        host=rule.host,
+                        path=path.path or "/",
+                        service_name=svc.name,
+                        service_port=port_val,
+                    ))
+                    if svc.name in service_by_name:
+                        add_edge(ing_id, service_by_name[svc.name], "routes-to")
+
         nodes.append(GraphNode(
             id=ing_id,
             kind=ResourceKind.Ingress,
             name=ing.metadata.name,
             namespace=namespace,
             labels=ing.metadata.labels or {},
+            ingress_rules=ing_rules or None,
         ))
-        if ing.spec.default_backend and ing.spec.default_backend.service:
-            svc_name = ing.spec.default_backend.service.name
-            if svc_name in service_by_name:
-                add_edge(ing_id, service_by_name[svc_name], "routes-to")
-        for rule in (ing.spec.rules or []):
-            if not rule.http:
-                continue
-            for path in (rule.http.paths or []):
-                if path.backend and path.backend.service:
-                    svc_name = path.backend.service.name
-                    if svc_name in service_by_name:
-                        add_edge(ing_id, service_by_name[svc_name], "routes-to")
+
         for tls in (ing.spec.tls or []):
             if tls.secret_name and tls.secret_name in secret_by_name:
                 add_edge(ing_id, secret_by_name[tls.secret_name], "uses-tls")

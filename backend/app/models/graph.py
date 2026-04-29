@@ -14,6 +14,20 @@ class ResourceKind(str, Enum):
     Secret = "Secret"
 
 
+class ServicePort(BaseModel):
+    name: Optional[str] = None
+    port: int
+    target_port: Optional[str] = None
+    protocol: str = "TCP"
+
+
+class IngressRule(BaseModel):
+    host: Optional[str] = None
+    path: str
+    service_name: str
+    service_port: Optional[str] = None
+
+
 class GraphNode(BaseModel):
     id: str
     kind: ResourceKind
@@ -23,6 +37,8 @@ class GraphNode(BaseModel):
     status: Optional[str] = None
     replicas: Optional[int] = None
     selector: Optional[dict[str, str]] = None
+    ports: Optional[list[ServicePort]] = None
+    ingress_rules: Optional[list[IngressRule]] = None
 
 
 class GraphEdge(BaseModel):
