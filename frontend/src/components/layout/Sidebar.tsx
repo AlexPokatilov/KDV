@@ -1,6 +1,9 @@
+import { useMemo } from 'react'
+import { useGraphQuery } from '../../api/graph'
 import { useNamespacesQuery } from '../../api/namespaces'
 import { useUIStore } from '../../store/uiStore'
-import type { ViewType } from '../../types/graph'
+import type { ResourceKind, ViewType } from '../../types/graph'
+import { ALL_KINDS, KIND_COLORS } from '../../utils/kindMeta'
 
 const VIEW_TYPES: { value: ViewType; label: string; available: boolean }[] = [
   { value: 'graph', label: 'Graph', available: true },
@@ -9,8 +12,26 @@ const VIEW_TYPES: { value: ViewType; label: string; available: boolean }[] = [
 ]
 
 export function Sidebar() {
-  const { selectedNamespace, viewType, setNamespace, setViewType } = useUIStore()
-  const { data, isLoading } = useNamespacesQuery()
+  const {
+    selectedNamespace,
+    viewType,
+    visibleKinds,
+    setNamespace,
+    setViewType,
+    toggleKind,
+    setAllKindsVisible,
+    clearKinds,
+  } = useUIStore()
+  const { data: nsData, isLoading: nsLoading } = useNamespacesQuery()
+  const { data: graphData } = useGraphQuery(selectedNamespace)
+
+  const counts = useMemo(() => {
+    const c: Partial<Record<ResourceKind, number>> = {}
+    graphData?.nodes.forEach((n) => {
+      c[n.kind] = (c[n.kind] ?? 0) + 1
+    })
+    return c
+  }, [graphData])
 
   return (
     <aside className="sidebar">
@@ -23,10 +44,10 @@ export function Sidebar() {
           className="sidebar__select"
           value={selectedNamespace}
           onChange={(e) => setNamespace(e.target.value)}
-          disabled={isLoading}
+          disabled={nsLoading}
         >
-          {isLoading && <option>Loading…</option>}
-          {data?.namespaces.map((ns) => (
+          {nsLoading && <option>Loading…</option>}
+          {nsData?.namespaces.map((ns) => (
             <option key={ns} value={ns}>
               {ns}
             </option>
@@ -51,22 +72,42 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="sidebar__section sidebar__legend">
-        <span className="sidebar__label">Legend</span>
-        {[
-          { color: '#3b82f6', label: 'Deployment' },
-          { color: '#06b6d4', label: 'StatefulSet' },
-          { color: '#22c55e', label: 'Pod' },
-          { color: '#f59e0b', label: 'Service' },
-          { color: '#8b5cf6', label: 'Ingress' },
-          { color: '#ec4899', label: 'ConfigMap' },
-          { color: '#f43f5e', label: 'Secret' },
-        ].map(({ color, label }) => (
-          <div key={label} className="legend-item">
-            <span className="legend-dot" style={{ background: color }} />
-            <span>{label}</span>
+      <div className="sidebar__section">
+        <div className="sidebar__filter-header">
+          <span className="sidebar__label">Filter</span>
+          <div className="sidebar__filter-actions">
+            <button onClick={setAllKindsVisible} title="Show all">
+              all
+            </button>
+            <button onClick={clearKinds} title="Hide all">
+              none
+            </button>
           </div>
-        ))}
+        </div>
+        <div className="filter-list">
+          {ALL_KINDS.map((kind) => {
+            const count = counts[kind] ?? 0
+            const checked = visibleKinds[kind]
+            return (
+              <label
+                key={kind}
+                className={`filter-item ${count === 0 ? 'filter-item--empty' : ''}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={() => toggleKind(kind)}
+                />
+                <span
+                  className="legend-dot"
+                  style={{ background: KIND_COLORS[kind] }}
+                />
+                <span className="filter-item__name">{kind}</span>
+                <span className="filter-item__count">{count}</span>
+              </label>
+            )
+          })}
+        </div>
       </div>
     </aside>
   )

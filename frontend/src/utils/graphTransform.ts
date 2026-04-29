@@ -1,7 +1,19 @@
 import dagre from '@dagrejs/dagre'
 import { MarkerType, Position } from '@xyflow/react'
 import type { Edge as RFEdge, Node as RFNode } from '@xyflow/react'
-import type { GraphResponse } from '../types/graph'
+import type { GraphResponse, ResourceKind } from '../types/graph'
+
+export function filterByKinds(
+  response: GraphResponse,
+  visible: Record<ResourceKind, boolean>,
+): GraphResponse {
+  const visibleNodes = response.nodes.filter((n) => visible[n.kind])
+  const visibleIds = new Set(visibleNodes.map((n) => n.id))
+  const visibleEdges = response.edges.filter(
+    (e) => visibleIds.has(e.source) && visibleIds.has(e.target),
+  )
+  return { ...response, nodes: visibleNodes, edges: visibleEdges }
+}
 
 const NODE_WIDTH = 200
 const NODE_HEIGHT = 72
