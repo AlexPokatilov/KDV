@@ -25,7 +25,7 @@ interface UIState {
 
 export const useUIStore = create<UIState>((set) => ({
   selectedNamespace: 'default',
-  viewType: 'graph',
+  viewType: 'graph' as ViewType,
   selectedNodeId: null,
   visibleKinds: allVisible(),
   setNamespace: (ns) => set({ selectedNamespace: ns }),

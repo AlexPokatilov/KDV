@@ -7,8 +7,7 @@ import { ALL_KINDS, KIND_COLORS } from '../../utils/kindMeta'
 
 const VIEW_TYPES: { value: ViewType; label: string; available: boolean }[] = [
   { value: 'graph', label: 'Graph', available: true },
-  { value: 'mindmap', label: 'Mindmap', available: false },
-  { value: 'tree', label: 'Tree', available: false },
+  { value: 'bubbles', label: 'Bubbles', available: false },
 ]
 
 export function Sidebar() {
