@@ -75,12 +75,9 @@ export function toReactFlowGraph(response: GraphResponse): {
       id: e.id,
       source: e.source,
       target: e.target,
-      label: e.relation,
       animated: e.relation === 'selects',
       markerEnd: { type: MarkerType.ArrowClosed, color: stroke },
       style: { stroke, strokeWidth: 1.5 },
-      labelStyle: { fontSize: 11, fill: '#94a3b8' },
-      labelBgStyle: { fill: '#1e293b', fillOpacity: 0.8 },
     }
   })
 
