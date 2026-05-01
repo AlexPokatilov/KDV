@@ -20,7 +20,11 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="KDV - Kubernetes Dependency Viewer", version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title="KDV - Kubernetes Dependency Viewer",
+    version="1.0.0",
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,

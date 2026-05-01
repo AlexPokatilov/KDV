@@ -1,6 +1,13 @@
 from datetime import datetime, timezone
 
-from app.models.graph import GraphEdge, GraphNode, GraphResponse, IngressRule, ResourceKind, ServicePort
+from app.models.graph import (
+    GraphEdge,
+    GraphNode,
+    GraphResponse,
+    IngressRule,
+    ResourceKind,
+    ServicePort,
+)
 from app.services.k8s_client import KubernetesClient
 
 
