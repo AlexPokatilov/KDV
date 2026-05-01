@@ -1,28 +1,14 @@
 services:
-  backend:
+  kdv:
     build:
-      context: backend
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
       - ${HOME}/.kube:/root/.kube:ro
     environment:
       KUBECONFIG: /root/.kube/config
       IN_CLUSTER: "false"
-      LOG_LEVEL: debug
-    restart: unless-stopped
-
-  frontend:
-    build:
-      context: frontend
-      dockerfile: Dockerfile.dev
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
-    depends_on:
-      - backend
+      LOG_LEVEL: info
     restart: unless-stopped
