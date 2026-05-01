@@ -27,6 +27,8 @@ import { DeploymentNode } from './nodes/DeploymentNode'
 import { IngressNode } from './nodes/IngressNode'
 import { JobNode } from './nodes/JobNode'
 import { PodGroupNode } from './nodes/PodGroupNode'
+import { PVCNode } from './nodes/PVCNode'
+import { PVNode } from './nodes/PVNode'
 import { PodNode } from './nodes/PodNode'
 import { SecretGroupNode } from './nodes/SecretGroupNode'
 import { SecretNode } from './nodes/SecretNode'
@@ -47,6 +49,8 @@ const nodeTypes: NodeTypes = {
   configmapgroup: ConfigMapGroupNode,
   secret: SecretNode,
   secretgroup: SecretGroupNode,
+  persistentvolumeclaim: PVCNode,
+  persistentvolume: PVNode,
 }
 
 export function GraphView() {

@@ -11,6 +11,8 @@ export const KIND_COLORS: Record<ResourceKind, string> = {
   Pod: '#22c55e',
   ConfigMap: '#ec4899',
   Secret: '#f43f5e',
+  PersistentVolumeClaim: '#6366f1',
+  PersistentVolume: '#84cc16',
 }
 
 export const ALL_KINDS: ResourceKind[] = [
@@ -24,4 +26,6 @@ export const ALL_KINDS: ResourceKind[] = [
   'Pod',
   'ConfigMap',
   'Secret',
+  'PersistentVolumeClaim',
+  'PersistentVolume',
 ]

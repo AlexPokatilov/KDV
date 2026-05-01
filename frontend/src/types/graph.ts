@@ -9,6 +9,8 @@ export type ResourceKind =
   | 'Ingress'
   | 'ConfigMap'
   | 'Secret'
+  | 'PersistentVolumeClaim'
+  | 'PersistentVolume'
 export type ViewType = 'graph' | 'bubbles' | 'table'
 
 export interface ServicePort {
@@ -42,7 +44,7 @@ export interface GraphEdge {
   id: string
   source: string
   target: string
-  relation: 'selects' | 'routes-to' | 'uses-config' | 'uses-secret' | 'uses-tls' | 'owns'
+  relation: 'selects' | 'routes-to' | 'uses-config' | 'uses-secret' | 'uses-tls' | 'owns' | 'mounts' | 'bound-to'
 }
 
 export interface GraphResponse {

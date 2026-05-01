@@ -24,6 +24,7 @@
   --accent-rose: #f43f5e;
   --accent-orange: #f97316;
   --accent-fuchsia: #d946ef;
+  --accent-lime: #84cc16;
   --radius: 8px;
   --radius-sm: 4px;
 }
@@ -420,6 +421,14 @@ body {
 .k8s-node--secret .k8s-node__icon,
 .k8s-node--secret .k8s-node__kind { color: var(--accent-rose); }
 .k8s-node--secret { border-left: 3px solid var(--accent-rose); }
+
+.k8s-node--pvc .k8s-node__icon,
+.k8s-node--pvc .k8s-node__kind { color: var(--accent-indigo); }
+.k8s-node--pvc { border-left: 3px solid var(--accent-indigo); }
+
+.k8s-node--pv .k8s-node__icon,
+.k8s-node--pv .k8s-node__kind { color: var(--accent-lime); }
+.k8s-node--pv { border-left: 3px solid var(--accent-lime); }
 
 /* ─── Pod Group Node ──────────────────────────────────── */
 

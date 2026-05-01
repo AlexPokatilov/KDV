@@ -33,6 +33,17 @@ def _ingress_port(port_spec) -> str | None:
     return port_spec.name or None
 
 
+def _pod_pvc_refs(pod) -> set[str]:
+    refs: set[str] = set()
+    spec = pod.spec
+    if not spec:
+        return refs
+    for vol in (spec.volumes or []):
+        if vol.persistent_volume_claim and vol.persistent_volume_claim.claim_name:
+            refs.add(vol.persistent_volume_claim.claim_name)
+    return refs
+
+
 def _pod_configmap_refs(pod) -> set[str]:
     refs: set[str] = set()
     spec = pod.spec
@@ -100,6 +111,8 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
     ingresses = k8s.list_ingresses(namespace)
     configmaps = k8s.list_configmaps(namespace)
     secrets = k8s.list_secrets(namespace)
+    pvcs = k8s.list_pvcs(namespace)
+    all_pvs = k8s.list_pvs()
 
     nodes: list[GraphNode] = []
     edges: list[GraphEdge] = []
@@ -288,7 +301,43 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             status=sec.type,
         ))
 
-    # ─── Pods → ConfigMap / Secret ────────────────────
+    # ─── PVCs → PVs ───────────────────────────────────
+    pvc_by_name: dict[str, str] = {}
+    pv_names_needed: set[str] = set()
+    for pvc in pvcs:
+        pvc_id = _node_id("PersistentVolumeClaim", namespace, pvc.metadata.name)
+        pvc_by_name[pvc.metadata.name] = pvc_id
+        nodes.append(GraphNode(
+            id=pvc_id,
+            kind=ResourceKind.PersistentVolumeClaim,
+            name=pvc.metadata.name,
+            namespace=namespace,
+            labels=pvc.metadata.labels or {},
+            status=pvc.status.phase or "Unknown",
+        ))
+        if pvc.spec.volume_name:
+            pv_names_needed.add(pvc.spec.volume_name)
+
+    pv_by_name: dict[str, str] = {}
+    for pv in all_pvs:
+        if pv.metadata.name not in pv_names_needed:
+            continue
+        pv_id = _node_id("PersistentVolume", "", pv.metadata.name)
+        pv_by_name[pv.metadata.name] = pv_id
+        nodes.append(GraphNode(
+            id=pv_id,
+            kind=ResourceKind.PersistentVolume,
+            name=pv.metadata.name,
+            namespace="",
+            labels=pv.metadata.labels or {},
+            status=pv.status.phase or "Unknown",
+        ))
+
+    for pvc in pvcs:
+        if pvc.spec.volume_name and pvc.spec.volume_name in pv_by_name:
+            add_edge(pvc_by_name[pvc.metadata.name], pv_by_name[pvc.spec.volume_name], "bound-to")
+
+    # ─── Pods → ConfigMap / Secret / PVC ─────────────
     for pod in pods:
         pod_id = _node_id("Pod", namespace, pod.metadata.name)
         for cm_name in _pod_configmap_refs(pod):
@@ -297,6 +346,9 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
         for sec_name in _pod_secret_refs(pod):
             if sec_name in secret_by_name:
                 add_edge(pod_id, secret_by_name[sec_name], "uses-secret")
+        for pvc_name in _pod_pvc_refs(pod):
+            if pvc_name in pvc_by_name:
+                add_edge(pod_id, pvc_by_name[pvc_name], "mounts")
 
     # ─── Ingresses → Services + Ingresses → Secret (TLS) ──
     for ing in ingresses:

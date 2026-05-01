@@ -15,6 +15,8 @@ class ResourceKind(str, Enum):
     Ingress = "Ingress"
     ConfigMap = "ConfigMap"
     Secret = "Secret"
+    PersistentVolumeClaim = "PersistentVolumeClaim"
+    PersistentVolume = "PersistentVolume"
 
 
 class ServicePort(BaseModel):

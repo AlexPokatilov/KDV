@@ -60,3 +60,9 @@ class KubernetesClient:
 
     def list_cronjobs(self, namespace: str):
         return self._batch.list_namespaced_cron_job(namespace=namespace).items
+
+    def list_pvcs(self, namespace: str):
+        return self._core.list_namespaced_persistent_volume_claim(namespace=namespace).items
+
+    def list_pvs(self):
+        return self._core.list_persistent_volume().items
