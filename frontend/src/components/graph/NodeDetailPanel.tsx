@@ -84,7 +84,7 @@ export function NodeDetailPanel({ node }: Props) {
           <span>{node.status}</span>
         </div>
       )}
-      {node.replicas !== undefined && (
+      {node.replicas != null && (
         <div className="detail-panel__meta">
           <span className="detail-panel__label">replicas</span>
           <span>{node.replicas}</span>
