@@ -21,6 +21,7 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import { NodeDetailPanel } from './NodeDetailPanel'
 import { ConfigMapGroupNode } from './nodes/ConfigMapGroupNode'
 import { ConfigMapNode } from './nodes/ConfigMapNode'
+import { PodGroupNode } from './nodes/PodGroupNode'
 import { DaemonSetNode } from './nodes/DaemonSetNode'
 import { DeploymentNode } from './nodes/DeploymentNode'
 import { IngressNode } from './nodes/IngressNode'
@@ -32,6 +33,7 @@ import { StatefulSetNode } from './nodes/StatefulSetNode'
 
 const nodeTypes: NodeTypes = {
   pod: PodNode,
+  podgroup: PodGroupNode,
   deployment: DeploymentNode,
   statefulset: StatefulSetNode,
   daemonset: DaemonSetNode,

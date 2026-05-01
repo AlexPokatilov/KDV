@@ -62,12 +62,15 @@ export function toReactFlowGraph(response: GraphResponse): {
     connectedIds.add(e.target)
   })
 
+  const isolatedPods: GraphNode[] = []
   const isolatedSecrets: GraphNode[] = []
   const isolatedConfigMaps: GraphNode[] = []
   const regularNodes: RFNode[] = []
 
   response.nodes.forEach((n) => {
-    if (n.kind === 'Secret' && !connectedIds.has(n.id)) {
+    if (n.kind === 'Pod' && !connectedIds.has(n.id)) {
+      isolatedPods.push(n)
+    } else if (n.kind === 'Secret' && !connectedIds.has(n.id)) {
       isolatedSecrets.push(n)
     } else if (n.kind === 'ConfigMap' && !connectedIds.has(n.id)) {
       isolatedConfigMaps.push(n)
@@ -83,6 +86,17 @@ export function toReactFlowGraph(response: GraphResponse): {
 
   const nodes: RFNode[] = [...regularNodes]
   const nodeSizes = new Map<string, { width: number; height: number }>()
+
+  if (isolatedPods.length > 0) {
+    const groupHeight = GROUP_HEADER_HEIGHT + Math.min(isolatedPods.length, 8) * GROUP_ITEM_HEIGHT
+    nodes.push({
+      id: '__pod_group__',
+      type: 'podgroup',
+      position: { x: 0, y: 0 },
+      data: { pods: isolatedPods, kind: 'Pod' } as unknown as Record<string, unknown>,
+    })
+    nodeSizes.set('__pod_group__', { width: GROUP_WIDTH, height: groupHeight })
+  }
 
   if (isolatedSecrets.length > 0) {
     const groupHeight = GROUP_HEADER_HEIGHT + Math.min(isolatedSecrets.length, 8) * GROUP_ITEM_HEIGHT
