@@ -439,6 +439,72 @@ body {
   border-top: none;
 }
 
+/* ─── ConfigMap Group Node ────────────────────────────── */
+
+.configmap-group-node {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent-pink);
+  border-radius: var(--radius);
+  width: 220px;
+  overflow: hidden;
+}
+
+.configmap-group-node__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.configmap-group-node__icon {
+  color: var(--accent-pink);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.configmap-group-node__kind {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-pink);
+  flex: 1;
+}
+
+.configmap-group-node__count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.06);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.configmap-group-node__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 224px;
+  overflow-y: auto;
+}
+
+.configmap-group-node__item {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--text-secondary);
+  padding: 5px 10px;
+  border-top: 1px solid var(--border);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.configmap-group-node__item:first-child {
+  border-top: none;
+}
+
 /* Pod status colors */
 .k8s-node--running .k8s-node__status { color: var(--accent-green); }
 .k8s-node--pending .k8s-node__status { color: var(--accent-yellow); }

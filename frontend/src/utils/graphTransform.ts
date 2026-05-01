@@ -63,11 +63,14 @@ export function toReactFlowGraph(response: GraphResponse): {
   })
 
   const isolatedSecrets: GraphNode[] = []
+  const isolatedConfigMaps: GraphNode[] = []
   const regularNodes: RFNode[] = []
 
   response.nodes.forEach((n) => {
     if (n.kind === 'Secret' && !connectedIds.has(n.id)) {
       isolatedSecrets.push(n)
+    } else if (n.kind === 'ConfigMap' && !connectedIds.has(n.id)) {
+      isolatedConfigMaps.push(n)
     } else {
       regularNodes.push({
         id: n.id,
@@ -90,6 +93,17 @@ export function toReactFlowGraph(response: GraphResponse): {
       data: { secrets: isolatedSecrets, kind: 'Secret' } as unknown as Record<string, unknown>,
     })
     nodeSizes.set('__secret_group__', { width: GROUP_WIDTH, height: groupHeight })
+  }
+
+  if (isolatedConfigMaps.length > 0) {
+    const groupHeight = GROUP_HEADER_HEIGHT + Math.min(isolatedConfigMaps.length, 8) * GROUP_ITEM_HEIGHT
+    nodes.push({
+      id: '__configmap_group__',
+      type: 'configmapgroup',
+      position: { x: 0, y: 0 },
+      data: { configmaps: isolatedConfigMaps, kind: 'ConfigMap' } as unknown as Record<string, unknown>,
+    })
+    nodeSizes.set('__configmap_group__', { width: GROUP_WIDTH, height: groupHeight })
   }
 
   const kindByNodeId = new Map(response.nodes.map((n) => [n.id, n.kind]))

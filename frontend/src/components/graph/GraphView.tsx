@@ -19,6 +19,7 @@ import { KIND_COLORS } from '../../utils/kindMeta'
 import { ErrorBanner } from '../common/ErrorBanner'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { NodeDetailPanel } from './NodeDetailPanel'
+import { ConfigMapGroupNode } from './nodes/ConfigMapGroupNode'
 import { ConfigMapNode } from './nodes/ConfigMapNode'
 import { DaemonSetNode } from './nodes/DaemonSetNode'
 import { DeploymentNode } from './nodes/DeploymentNode'
@@ -37,6 +38,7 @@ const nodeTypes: NodeTypes = {
   service: ServiceNode,
   ingress: IngressNode,
   configmap: ConfigMapNode,
+  configmapgroup: ConfigMapGroupNode,
   secret: SecretNode,
   secretgroup: SecretGroupNode,
 }
