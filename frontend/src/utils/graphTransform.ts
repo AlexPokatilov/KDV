@@ -38,8 +38,8 @@ export function applyDagreLayout(
   edges: RFEdge[],
   direction: 'TB' | 'LR' = 'TB',
   nodeSizes?: Map<string, { width: number; height: number }>,
-  rankSep = 80,
-  nodeSep = 50,
+  rankSep = 100,
+  nodeSep = 20,
 ): RFNode[] {
   const g = new dagre.graphlib.Graph()
   g.setGraph({ rankdir: direction, ranksep: rankSep, nodesep: nodeSep })
@@ -76,8 +76,8 @@ function darkenColor(hex: string, factor: number): string {
 export function toReactFlowGraph(
   response: GraphResponse,
   direction: 'TB' | 'LR' = 'TB',
-  rankSep = 80,
-  nodeSep = 50,
+  rankSep = 100,
+  nodeSep = 20,
 ): {
   nodes: RFNode[]
   edges: RFEdge[]
@@ -172,4 +172,3 @@ export function toReactFlowGraph(
   const laidOut = applyDagreLayout(nodes, edges, direction, nodeSizes, rankSep, nodeSep)
   return { nodes: laidOut, edges }
 }
-

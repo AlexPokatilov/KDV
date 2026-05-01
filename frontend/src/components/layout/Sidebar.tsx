@@ -115,7 +115,7 @@ export function Sidebar() {
             <span>Rank gap</span><span>{rankSep}</span>
           </label>
           <input
-            type="range" min={20} max={200} step={10}
+            type="range" min={60} max={500} step={20}
             value={rankSep}
             onChange={(e) => setRankSep(+e.target.value)}
           />
@@ -123,7 +123,7 @@ export function Sidebar() {
             <span>Node gap</span><span>{nodeSep}</span>
           </label>
           <input
-            type="range" min={10} max={150} step={10}
+            type="range" min={20} max={200} step={10}
             value={nodeSep}
             onChange={(e) => setNodeSep(+e.target.value)}
           />
