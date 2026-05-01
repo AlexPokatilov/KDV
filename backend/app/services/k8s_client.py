@@ -19,7 +19,10 @@ class KubernetesClient:
                 logger.info("Loaded in-cluster Kubernetes config")
             except ConfigException:
                 config.load_kube_config(config_file=settings.kubeconfig_path)
-                logger.info("Loaded kubeconfig from %s", settings.kubeconfig_path or "~/.kube/config")
+                logger.info(
+                    "Loaded kubeconfig from %s",
+                    settings.kubeconfig_path or "~/.kube/config",
+                )
 
         self._core = client.CoreV1Api()
         self._apps = client.AppsV1Api()
@@ -61,7 +64,9 @@ class KubernetesClient:
         return self._batch.list_namespaced_cron_job(namespace=namespace).items
 
     def list_pvcs(self, namespace: str):
-        return self._core.list_namespaced_persistent_volume_claim(namespace=namespace).items
+        return self._core.list_namespaced_persistent_volume_claim(
+            namespace=namespace
+        ).items
 
     def list_pvs(self):
         return self._core.list_persistent_volume().items
