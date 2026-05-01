@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 from kubernetes import client, config
 from kubernetes.config.config_exception import ConfigException
