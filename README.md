@@ -1,5 +1,12 @@
 # Kubernetes Dependency Viewer (KDV)
 
+[![Build](https://github.com/AlexPokatilov/KDV/actions/workflows/build.yml/badge.svg)](https://github.com/AlexPokatilov/KDV/actions/workflows/build.yml)
+[![Lint](https://github.com/AlexPokatilov/KDV/actions/workflows/lint.yml/badge.svg)](https://github.com/AlexPokatilov/KDV/actions/workflows/lint.yml)
+[![Docker Lint](https://github.com/AlexPokatilov/KDV/actions/workflows/hadolint.yml/badge.svg)](https://github.com/AlexPokatilov/KDV/actions/workflows/hadolint.yml)
+[![CodeQL](https://github.com/AlexPokatilov/KDV/actions/workflows/codeql.yml/badge.svg)](https://github.com/AlexPokatilov/KDV/actions/workflows/codeql.yml)
+[![Release](https://github.com/AlexPokatilov/KDV/actions/workflows/release.yml/badge.svg)](https://github.com/AlexPokatilov/KDV/actions/workflows/release.yml)
+[![Helm Release](https://github.com/AlexPokatilov/KDV/actions/workflows/helm-release.yml/badge.svg)](https://github.com/AlexPokatilov/KDV/actions/workflows/helm-release.yml)
+
 KDV (Kubernetes Dependency Viewer) is an open-source tool designed to visualize the relationships and dependencies between various Kubernetes resources within a cluster. It provides an intuitive, interactive graph interface to help developers and DevOps engineers understand how workloads, services, configurations, and storage are connected.
 
 ## Features
