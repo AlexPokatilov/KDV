@@ -3,6 +3,8 @@ export type ResourceKind =
   | 'Deployment'
   | 'StatefulSet'
   | 'DaemonSet'
+  | 'Job'
+  | 'CronJob'
   | 'Service'
   | 'Ingress'
   | 'ConfigMap'
@@ -40,7 +42,7 @@ export interface GraphEdge {
   id: string
   source: string
   target: string
-  relation: 'selects' | 'routes-to' | 'uses-config' | 'uses-secret' | 'uses-tls'
+  relation: 'selects' | 'routes-to' | 'uses-config' | 'uses-secret' | 'uses-tls' | 'owns'
 }
 
 export interface GraphResponse {

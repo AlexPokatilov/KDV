@@ -22,6 +22,8 @@
   --accent-teal: #14b8a6;
   --accent-pink: #ec4899;
   --accent-rose: #f43f5e;
+  --accent-orange: #f97316;
+  --accent-fuchsia: #d946ef;
   --radius: 8px;
   --radius-sm: 4px;
 }
@@ -402,6 +404,14 @@ body {
 .k8s-node--daemonset .k8s-node__icon,
 .k8s-node--daemonset .k8s-node__kind { color: var(--accent-teal); }
 .k8s-node--daemonset { border-left: 3px solid var(--accent-teal); }
+
+.k8s-node--job .k8s-node__icon,
+.k8s-node--job .k8s-node__kind { color: var(--accent-orange); }
+.k8s-node--job { border-left: 3px solid var(--accent-orange); }
+
+.k8s-node--cronjob .k8s-node__icon,
+.k8s-node--cronjob .k8s-node__kind { color: var(--accent-fuchsia); }
+.k8s-node--cronjob { border-left: 3px solid var(--accent-fuchsia); }
 
 .k8s-node--configmap .k8s-node__icon,
 .k8s-node--configmap .k8s-node__kind { color: var(--accent-pink); }

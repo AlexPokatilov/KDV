@@ -25,6 +25,7 @@ class KubernetesClient:
         self._core = client.CoreV1Api()
         self._apps = client.AppsV1Api()
         self._networking = client.NetworkingV1Api()
+        self._batch = client.BatchV1Api()
 
     def list_namespaces(self) -> list[str]:
         resp = self._core.list_namespace()
@@ -53,3 +54,9 @@ class KubernetesClient:
 
     def list_secrets(self, namespace: str):
         return self._core.list_namespaced_secret(namespace=namespace).items
+
+    def list_jobs(self, namespace: str):
+        return self._batch.list_namespaced_job(namespace=namespace).items
+
+    def list_cronjobs(self, namespace: str):
+        return self._batch.list_namespaced_cron_job(namespace=namespace).items

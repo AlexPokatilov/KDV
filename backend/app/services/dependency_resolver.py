@@ -94,6 +94,8 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
     deployments = k8s.list_deployments(namespace)
     statefulsets = k8s.list_statefulsets(namespace)
     daemonsets = k8s.list_daemonsets(namespace)
+    jobs = k8s.list_jobs(namespace)
+    cronjobs = k8s.list_cronjobs(namespace)
     services = k8s.list_services(namespace)
     ingresses = k8s.list_ingresses(namespace)
     configmaps = k8s.list_configmaps(namespace)
@@ -190,6 +192,46 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
         for pod in pods:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(ds_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
+
+    # ─── CronJobs ─────────────────────────────────────
+    cronjob_by_name: dict[str, str] = {}
+    for cj in cronjobs:
+        cj_id = _node_id("CronJob", namespace, cj.metadata.name)
+        cronjob_by_name[cj.metadata.name] = cj_id
+        schedule = cj.spec.schedule or ""
+        nodes.append(GraphNode(
+            id=cj_id,
+            kind=ResourceKind.CronJob,
+            name=cj.metadata.name,
+            namespace=namespace,
+            labels=cj.metadata.labels or {},
+            status=schedule,
+        ))
+
+    # ─── Jobs → Pods ──────────────────────────────────
+    for job in jobs:
+        selector = {}
+        if job.spec.selector and job.spec.selector.match_labels:
+            selector = job.spec.selector.match_labels
+        succeeded = job.status.succeeded or 0
+        completions = job.spec.completions or 1
+        job_id = _node_id("Job", namespace, job.metadata.name)
+        nodes.append(GraphNode(
+            id=job_id,
+            kind=ResourceKind.Job,
+            name=job.metadata.name,
+            namespace=namespace,
+            labels=job.metadata.labels or {},
+            status=f"{succeeded}/{completions}",
+            replicas=completions,
+            selector=selector,
+        ))
+        for pod in pods:
+            if _labels_match(selector, pod.metadata.labels or {}):
+                add_edge(job_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
+        for ref in (job.metadata.owner_references or []):
+            if ref.kind == "CronJob" and ref.name in cronjob_by_name:
+                add_edge(cronjob_by_name[ref.name], job_id, "owns")
 
     # ─── Services → Pods ──────────────────────────────
     service_by_name: dict[str, str] = {}

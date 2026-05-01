@@ -9,6 +9,8 @@ class ResourceKind(str, Enum):
     Deployment = "Deployment"
     StatefulSet = "StatefulSet"
     DaemonSet = "DaemonSet"
+    Job = "Job"
+    CronJob = "CronJob"
     Service = "Service"
     Ingress = "Ingress"
     ConfigMap = "ConfigMap"

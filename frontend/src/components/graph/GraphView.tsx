@@ -21,10 +21,12 @@ import { LoadingSpinner } from '../common/LoadingSpinner'
 import { NodeDetailPanel } from './NodeDetailPanel'
 import { ConfigMapGroupNode } from './nodes/ConfigMapGroupNode'
 import { ConfigMapNode } from './nodes/ConfigMapNode'
-import { PodGroupNode } from './nodes/PodGroupNode'
+import { CronJobNode } from './nodes/CronJobNode'
 import { DaemonSetNode } from './nodes/DaemonSetNode'
 import { DeploymentNode } from './nodes/DeploymentNode'
 import { IngressNode } from './nodes/IngressNode'
+import { JobNode } from './nodes/JobNode'
+import { PodGroupNode } from './nodes/PodGroupNode'
 import { PodNode } from './nodes/PodNode'
 import { SecretGroupNode } from './nodes/SecretGroupNode'
 import { SecretNode } from './nodes/SecretNode'
@@ -37,6 +39,8 @@ const nodeTypes: NodeTypes = {
   deployment: DeploymentNode,
   statefulset: StatefulSetNode,
   daemonset: DaemonSetNode,
+  job: JobNode,
+  cronjob: CronJobNode,
   service: ServiceNode,
   ingress: IngressNode,
   configmap: ConfigMapNode,
