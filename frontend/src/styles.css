@@ -439,6 +439,15 @@ body {
   border-top: none;
 }
 
+.secret-group-node__item--clickable {
+  cursor: pointer;
+}
+
+.secret-group-node__item--clickable:hover {
+  background: rgba(244, 63, 94, 0.08);
+  color: var(--text-primary);
+}
+
 /* ─── ConfigMap Group Node ────────────────────────────── */
 
 .configmap-group-node {
@@ -503,6 +512,15 @@ body {
 
 .configmap-group-node__item:first-child {
   border-top: none;
+}
+
+.configmap-group-node__item--clickable {
+  cursor: pointer;
+}
+
+.configmap-group-node__item--clickable:hover {
+  background: rgba(236, 72, 153, 0.08);
+  color: var(--text-primary);
 }
 
 /* Pod status colors */
