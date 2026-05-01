@@ -60,12 +60,17 @@ export function toReactFlowGraph(response: GraphResponse): {
   const edges: RFEdge[] = response.edges.map((e) => {
     const sourceKind = kindByNodeId.get(e.source)
     const stroke = (sourceKind && KIND_COLORS[sourceKind]) ?? '#64748b'
+    const dashed = sourceKind === 'Ingress' || sourceKind === 'Service'
     return {
       id: e.id,
       source: e.source,
       target: e.target,
       animated: e.relation === 'selects',
-      style: { stroke, strokeWidth: 1.5 },
+      style: {
+        stroke,
+        strokeWidth: 1.5,
+        ...(dashed && { strokeDasharray: '6 3' }),
+      },
     }
   })
 
