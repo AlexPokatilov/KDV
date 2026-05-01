@@ -63,6 +63,14 @@ export function applyDagreLayout(
   })
 }
 
+function darkenColor(hex: string, factor: number): string {
+  const n = parseInt(hex.slice(1), 16)
+  const r = Math.floor(((n >> 16) & 0xff) * factor)
+  const g = Math.floor(((n >> 8) & 0xff) * factor)
+  const b = Math.floor((n & 0xff) * factor)
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
+}
+
 export function toReactFlowGraph(response: GraphResponse): {
   nodes: RFNode[]
   edges: RFEdge[]
@@ -138,13 +146,13 @@ export function toReactFlowGraph(response: GraphResponse): {
     const targetKind = kindByNodeId.get(e.target)
     const colorKind =
       (e.relation === 'uses-config' || e.relation === 'uses-secret') ? targetKind : sourceKind
-    const stroke = (colorKind && KIND_COLORS[colorKind]) ?? '#64748b'
+    const baseColor = (colorKind && KIND_COLORS[colorKind]) ?? '#64748b'
+    const stroke = darkenColor(baseColor, 0.8)
     const dashed = sourceKind === 'Ingress' || sourceKind === 'Service'
     return {
       id: e.id,
       source: e.source,
       target: e.target,
-      animated: e.relation === 'selects',
       style: {
         stroke,
         strokeWidth: 1.5,
