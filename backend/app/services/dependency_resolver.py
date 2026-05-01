@@ -136,7 +136,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
                 relation=relation,
             ))
 
-    # ─── Pods ─────────────────────────────────────────
+    # Pods
     for pod in pods:
         nodes.append(GraphNode(
             id=_node_id("Pod", namespace, pod.metadata.name),
@@ -147,7 +147,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             status=_pod_status(pod),
         ))
 
-    # ─── Deployments → Pods ───────────────────────────
+    # Deployments -> Pods
     for dep in deployments:
         selector = {}
         if dep.spec.selector and dep.spec.selector.match_labels:
@@ -169,7 +169,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(dep_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
-    # ─── StatefulSets → Pods ──────────────────────────
+    # StatefulSets -> Pods
     for sts in statefulsets:
         selector = {}
         if sts.spec.selector and sts.spec.selector.match_labels:
@@ -191,7 +191,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(sts_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
-    # ─── DaemonSets → Pods ────────────────────────────
+    # DaemonSets -> Pods
     for ds in daemonsets:
         selector = {}
         if ds.spec.selector and ds.spec.selector.match_labels:
@@ -213,7 +213,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(ds_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
-    # ─── CronJobs ─────────────────────────────────────
+    # CronJobs
     cronjob_by_name: dict[str, str] = {}
     for cj in cronjobs:
         cj_id = _node_id("CronJob", namespace, cj.metadata.name)
@@ -228,7 +228,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             status=schedule,
         ))
 
-    # ─── Jobs → Pods ──────────────────────────────────
+    # Jobs -> Pods
     for job in jobs:
         selector = {}
         if job.spec.selector and job.spec.selector.match_labels:
@@ -253,7 +253,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if ref.kind == "CronJob" and ref.name in cronjob_by_name:
                 add_edge(cronjob_by_name[ref.name], job_id, "owns")
 
-    # ─── Services → Pods ──────────────────────────────
+    # Services -> Pods
     service_by_name: dict[str, str] = {}
     for svc in services:
         selector = svc.spec.selector or {}
@@ -281,7 +281,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if _labels_match(selector, pod.metadata.labels or {}):
                 add_edge(svc_id, _node_id("Pod", namespace, pod.metadata.name), "selects")
 
-    # ─── ConfigMaps ───────────────────────────────────
+    # ConfigMaps
     configmap_by_name: dict[str, str] = {}
     for cm in configmaps:
         cm_id = _node_id("ConfigMap", namespace, cm.metadata.name)
@@ -294,7 +294,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             labels=cm.metadata.labels or {},
         ))
 
-    # ─── Secrets ──────────────────────────────────────
+    # Secrets
     secret_by_name: dict[str, str] = {}
     for sec in secrets:
         sec_id = _node_id("Secret", namespace, sec.metadata.name)
@@ -308,7 +308,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             status=sec.type,
         ))
 
-    # ─── PVCs → PVs ───────────────────────────────────
+    # PVCs -> PVs
     pvc_by_name: dict[str, str] = {}
     pv_names_needed: set[str] = set()
     for pvc in pvcs:
@@ -344,7 +344,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
         if pvc.spec.volume_name and pvc.spec.volume_name in pv_by_name:
             add_edge(pvc_by_name[pvc.metadata.name], pv_by_name[pvc.spec.volume_name], "bound-to")
 
-    # ─── Pods → ConfigMap / Secret / PVC ─────────────
+    # Pods -> ConfigMap / Secret / PVC
     for pod in pods:
         pod_id = _node_id("Pod", namespace, pod.metadata.name)
         for cm_name in _pod_configmap_refs(pod):
@@ -357,7 +357,7 @@ def build_graph(namespace: str, k8s: KubernetesClient) -> GraphResponse:
             if pvc_name in pvc_by_name:
                 add_edge(pod_id, pvc_by_name[pvc_name], "mounts")
 
-    # ─── Ingresses → Services + Ingresses → Secret (TLS) ──
+    # Ingresses -> Services + Ingresses -> Secret (TLS)
     for ing in ingresses:
         ing_id = _node_id("Ingress", namespace, ing.metadata.name)
         ing_rules: list[IngressRule] = []
