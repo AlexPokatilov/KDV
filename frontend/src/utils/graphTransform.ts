@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre'
-import { Position } from '@xyflow/react'
+import { MarkerType, Position } from '@xyflow/react'
 import type { Edge as RFEdge, Node as RFNode } from '@xyflow/react'
 import type { GraphNode, GraphResponse, ResourceKind } from '../types/graph'
 import { KIND_COLORS } from './kindMeta'
@@ -168,6 +168,7 @@ export function toReactFlowGraph(
         strokeWidth: 1.5,
         ...(dashed && { strokeDasharray: '6 3' }),
       },
+      ...(dashed && { markerEnd: { type: MarkerType.ArrowClosed, color: stroke } }),
     }
   })
 
