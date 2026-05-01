@@ -1,4 +1,4 @@
-import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { Handle, type NodeProps } from '@xyflow/react'
 import { SiKubernetes } from 'react-icons/si'
 import type { GraphNode } from '../../../types/graph'
 
@@ -6,7 +6,7 @@ export function DaemonSetNode({ data, selected }: NodeProps) {
   const node = data as unknown as GraphNode
   return (
     <div className={`k8s-node k8s-node--daemonset ${selected ? 'selected' : ''}`}>
-      <Handle type="target" position={Position.Top} />
+      <Handle type="target" />
       <div className="k8s-node__header">
         <SiKubernetes className="k8s-node__icon" />
         <span className="k8s-node__kind">DaemonSet</span>
@@ -15,7 +15,7 @@ export function DaemonSetNode({ data, selected }: NodeProps) {
       {node.status && (
         <div className="k8s-node__status">ready: {node.status}</div>
       )}
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" />
     </div>
   )
 }
