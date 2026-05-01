@@ -7,7 +7,7 @@ export type ResourceKind =
   | 'Ingress'
   | 'ConfigMap'
   | 'Secret'
-export type ViewType = 'graph' | 'bubbles'
+export type ViewType = 'graph' | 'bubbles' | 'table'
 
 export interface ServicePort {
   name?: string
