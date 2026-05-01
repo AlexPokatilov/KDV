@@ -1,7 +1,7 @@
 import dagre from '@dagrejs/dagre'
 import { Position } from '@xyflow/react'
 import type { Edge as RFEdge, Node as RFNode } from '@xyflow/react'
-import type { GraphResponse, ResourceKind } from '../types/graph'
+import type { GraphNode, GraphResponse, ResourceKind } from '../types/graph'
 import { KIND_COLORS } from './kindMeta'
 
 export function filterByKinds(
@@ -18,26 +18,34 @@ export function filterByKinds(
 
 const NODE_WIDTH = 200
 const NODE_HEIGHT = 72
+const GROUP_WIDTH = 220
+const GROUP_ITEM_HEIGHT = 28
+const GROUP_HEADER_HEIGHT = 40
 
 export function applyDagreLayout(
   nodes: RFNode[],
   edges: RFEdge[],
   direction: 'TB' | 'LR' = 'TB',
+  nodeSizes?: Map<string, { width: number; height: number }>,
 ): RFNode[] {
   const g = new dagre.graphlib.Graph()
   g.setGraph({ rankdir: direction, ranksep: 80, nodesep: 50 })
   g.setDefaultEdgeLabel(() => ({}))
 
-  nodes.forEach((n) => g.setNode(n.id, { width: NODE_WIDTH, height: NODE_HEIGHT }))
+  nodes.forEach((n) => {
+    const size = nodeSizes?.get(n.id) ?? { width: NODE_WIDTH, height: NODE_HEIGHT }
+    g.setNode(n.id, size)
+  })
   edges.forEach((e) => g.setEdge(e.source, e.target))
 
   dagre.layout(g)
 
   return nodes.map((n) => {
     const pos = g.node(n.id)
+    const size = nodeSizes?.get(n.id) ?? { width: NODE_WIDTH, height: NODE_HEIGHT }
     return {
       ...n,
-      position: { x: pos.x - NODE_WIDTH / 2, y: pos.y - NODE_HEIGHT / 2 },
+      position: { x: pos.x - size.width / 2, y: pos.y - size.height / 2 },
       targetPosition: direction === 'TB' ? Position.Top : Position.Left,
       sourcePosition: direction === 'TB' ? Position.Bottom : Position.Right,
     }
@@ -48,12 +56,41 @@ export function toReactFlowGraph(response: GraphResponse): {
   nodes: RFNode[]
   edges: RFEdge[]
 } {
-  const nodes: RFNode[] = response.nodes.map((n) => ({
-    id: n.id,
-    type: n.kind.toLowerCase(),
-    position: { x: 0, y: 0 },
-    data: n as unknown as Record<string, unknown>,
-  }))
+  const connectedIds = new Set<string>()
+  response.edges.forEach((e) => {
+    connectedIds.add(e.source)
+    connectedIds.add(e.target)
+  })
+
+  const isolatedSecrets: GraphNode[] = []
+  const regularNodes: RFNode[] = []
+
+  response.nodes.forEach((n) => {
+    if (n.kind === 'Secret' && !connectedIds.has(n.id)) {
+      isolatedSecrets.push(n)
+    } else {
+      regularNodes.push({
+        id: n.id,
+        type: n.kind.toLowerCase(),
+        position: { x: 0, y: 0 },
+        data: n as unknown as Record<string, unknown>,
+      })
+    }
+  })
+
+  const nodes: RFNode[] = [...regularNodes]
+  const nodeSizes = new Map<string, { width: number; height: number }>()
+
+  if (isolatedSecrets.length > 0) {
+    const groupHeight = GROUP_HEADER_HEIGHT + Math.min(isolatedSecrets.length, 8) * GROUP_ITEM_HEIGHT
+    nodes.push({
+      id: '__secret_group__',
+      type: 'secretgroup',
+      position: { x: 0, y: 0 },
+      data: { secrets: isolatedSecrets, kind: 'Secret' } as unknown as Record<string, unknown>,
+    })
+    nodeSizes.set('__secret_group__', { width: GROUP_WIDTH, height: groupHeight })
+  }
 
   const kindByNodeId = new Map(response.nodes.map((n) => [n.id, n.kind]))
 
@@ -74,6 +111,7 @@ export function toReactFlowGraph(response: GraphResponse): {
     }
   })
 
-  const laidOut = applyDagreLayout(nodes, edges)
+  const laidOut = applyDagreLayout(nodes, edges, 'TB', nodeSizes)
   return { nodes: laidOut, edges }
 }
+

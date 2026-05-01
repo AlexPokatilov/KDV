@@ -24,6 +24,7 @@ import { DaemonSetNode } from './nodes/DaemonSetNode'
 import { DeploymentNode } from './nodes/DeploymentNode'
 import { IngressNode } from './nodes/IngressNode'
 import { PodNode } from './nodes/PodNode'
+import { SecretGroupNode } from './nodes/SecretGroupNode'
 import { SecretNode } from './nodes/SecretNode'
 import { ServiceNode } from './nodes/ServiceNode'
 import { StatefulSetNode } from './nodes/StatefulSetNode'
@@ -37,6 +38,7 @@ const nodeTypes: NodeTypes = {
   ingress: IngressNode,
   configmap: ConfigMapNode,
   secret: SecretNode,
+  secretgroup: SecretGroupNode,
 }
 
 export function GraphView() {
