@@ -15,12 +15,14 @@ interface UIState {
   viewType: ViewType
   selectedNodeId: string | null
   visibleKinds: KindVisibility
+  nameFilter: string
   setNamespace: (ns: string) => void
   setViewType: (vt: ViewType) => void
   setSelectedNode: (id: string | null) => void
   toggleKind: (kind: ResourceKind) => void
   setAllKindsVisible: () => void
   clearKinds: () => void
+  setNameFilter: (q: string) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -28,6 +30,7 @@ export const useUIStore = create<UIState>((set) => ({
   viewType: 'graph' as ViewType,
   selectedNodeId: null,
   visibleKinds: allVisible(),
+  nameFilter: '',
   setNamespace: (ns) => set({ selectedNamespace: ns }),
   setViewType: (vt) => set({ viewType: vt }),
   setSelectedNode: (id) => set({ selectedNodeId: id }),
@@ -37,4 +40,5 @@ export const useUIStore = create<UIState>((set) => ({
     })),
   setAllKindsVisible: () => set({ visibleKinds: allVisible() }),
   clearKinds: () => set({ visibleKinds: noneVisible() }),
+  setNameFilter: (q) => set({ nameFilter: q }),
 }))

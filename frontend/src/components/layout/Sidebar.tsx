@@ -15,11 +15,13 @@ export function Sidebar() {
     selectedNamespace,
     viewType,
     visibleKinds,
+    nameFilter,
     setNamespace,
     setViewType,
     toggleKind,
     setAllKindsVisible,
     clearKinds,
+    setNameFilter,
   } = useUIStore()
   const { data: nsData, isLoading: nsLoading } = useNamespacesQuery()
   const { data: graphData } = useGraphQuery(selectedNamespace)
@@ -52,6 +54,20 @@ export function Sidebar() {
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="sidebar__section">
+        <label className="sidebar__label" htmlFor="name-search">
+          Search
+        </label>
+        <input
+          id="name-search"
+          type="text"
+          className="sidebar__input"
+          placeholder="Filter by name…"
+          value={nameFilter}
+          onChange={(e) => setNameFilter(e.target.value)}
+        />
       </div>
 
       <div className="sidebar__section">

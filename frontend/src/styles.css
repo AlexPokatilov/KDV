@@ -142,6 +142,25 @@ body {
   border-color: var(--accent-blue);
 }
 
+.sidebar__input {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 13px;
+  width: 100%;
+}
+
+.sidebar__input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.sidebar__input::placeholder {
+  color: var(--text-muted);
+}
+
 .sidebar__view-buttons {
   display: flex;
   flex-direction: column;

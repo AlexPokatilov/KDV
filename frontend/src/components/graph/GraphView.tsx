@@ -14,7 +14,7 @@ import { useCallback, useEffect } from 'react'
 import { useGraphQuery } from '../../api/graph'
 import { useUIStore } from '../../store/uiStore'
 import type { GraphNode } from '../../types/graph'
-import { filterByKinds, toReactFlowGraph } from '../../utils/graphTransform'
+import { filterByKinds, filterByName, toReactFlowGraph } from '../../utils/graphTransform'
 import { KIND_COLORS } from '../../utils/kindMeta'
 import { ErrorBanner } from '../common/ErrorBanner'
 import { LoadingSpinner } from '../common/LoadingSpinner'
@@ -46,7 +46,8 @@ const nodeTypes: NodeTypes = {
 }
 
 export function GraphView() {
-  const { selectedNamespace, selectedNodeId, visibleKinds, setSelectedNode } = useUIStore()
+  const { selectedNamespace, selectedNodeId, visibleKinds, nameFilter, setSelectedNode } =
+    useUIStore()
   const { data, isLoading, isError, error } = useGraphQuery(selectedNamespace)
 
   const [nodes, setNodes, onNodesChange] = useNodesState<RFNode>([])
@@ -54,12 +55,12 @@ export function GraphView() {
 
   useEffect(() => {
     if (data) {
-      const filtered = filterByKinds(data, visibleKinds)
+      const filtered = filterByName(filterByKinds(data, visibleKinds), nameFilter)
       const { nodes: n, edges: e } = toReactFlowGraph(filtered)
       setNodes(n)
       setEdges(e)
     }
-  }, [data, visibleKinds, setNodes, setEdges])
+  }, [data, visibleKinds, nameFilter, setNodes, setEdges])
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: { id: string }) => {

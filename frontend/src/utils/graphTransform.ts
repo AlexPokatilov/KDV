@@ -16,6 +16,17 @@ export function filterByKinds(
   return { ...response, nodes: visibleNodes, edges: visibleEdges }
 }
 
+export function filterByName(response: GraphResponse, query: string): GraphResponse {
+  const q = query.trim().toLowerCase()
+  if (!q) return response
+  const visibleNodes = response.nodes.filter((n) => n.name.toLowerCase().includes(q))
+  const visibleIds = new Set(visibleNodes.map((n) => n.id))
+  const visibleEdges = response.edges.filter(
+    (e) => visibleIds.has(e.source) && visibleIds.has(e.target),
+  )
+  return { ...response, nodes: visibleNodes, edges: visibleEdges }
+}
+
 const NODE_WIDTH = 200
 const NODE_HEIGHT = 72
 const GROUP_WIDTH = 220
