@@ -17,6 +17,8 @@ interface UIState {
   visibleKinds: KindVisibility
   nameFilter: string
   layoutDirection: 'TB' | 'LR'
+  rankSep: number
+  nodeSep: number
   setNamespace: (ns: string) => void
   setViewType: (vt: ViewType) => void
   setSelectedNode: (id: string | null) => void
@@ -25,6 +27,8 @@ interface UIState {
   clearKinds: () => void
   setNameFilter: (q: string) => void
   setLayoutDirection: (d: 'TB' | 'LR') => void
+  setRankSep: (v: number) => void
+  setNodeSep: (v: number) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -34,6 +38,8 @@ export const useUIStore = create<UIState>((set) => ({
   visibleKinds: allVisible(),
   nameFilter: '',
   layoutDirection: 'TB',
+  rankSep: 80,
+  nodeSep: 50,
   setNamespace: (ns) => set({ selectedNamespace: ns }),
   setViewType: (vt) => set({ viewType: vt }),
   setSelectedNode: (id) => set({ selectedNodeId: id }),
@@ -45,4 +51,6 @@ export const useUIStore = create<UIState>((set) => ({
   clearKinds: () => set({ visibleKinds: noneVisible() }),
   setNameFilter: (q) => set({ nameFilter: q }),
   setLayoutDirection: (d) => set({ layoutDirection: d }),
+  setRankSep: (v) => set({ rankSep: v }),
+  setNodeSep: (v) => set({ nodeSep: v }),
 }))

@@ -18,6 +18,8 @@ export function Sidebar() {
     visibleKinds,
     nameFilter,
     layoutDirection,
+    rankSep,
+    nodeSep,
     setNamespace,
     setViewType,
     toggleKind,
@@ -25,6 +27,8 @@ export function Sidebar() {
     clearKinds,
     setNameFilter,
     setLayoutDirection,
+    setRankSep,
+    setNodeSep,
   } = useUIStore()
   const { data: nsData, isLoading: nsLoading } = useNamespacesQuery()
   const { data: graphData } = useGraphQuery(selectedNamespace)
@@ -105,6 +109,24 @@ export function Sidebar() {
           >
             Horizontal
           </button>
+        </div>
+        <div className="sidebar__spacing">
+          <label className="sidebar__spacing-label">
+            <span>Rank gap</span><span>{rankSep}</span>
+          </label>
+          <input
+            type="range" min={20} max={200} step={10}
+            value={rankSep}
+            onChange={(e) => setRankSep(+e.target.value)}
+          />
+          <label className="sidebar__spacing-label">
+            <span>Node gap</span><span>{nodeSep}</span>
+          </label>
+          <input
+            type="range" min={10} max={150} step={10}
+            value={nodeSep}
+            onChange={(e) => setNodeSep(+e.target.value)}
+          />
         </div>
       </div>
 

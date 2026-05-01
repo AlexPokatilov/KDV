@@ -198,6 +198,25 @@ body {
   cursor: not-allowed;
 }
 
+.sidebar__spacing {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.sidebar__spacing-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.sidebar__spacing input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent-blue);
+}
+
 .soon-badge {
   font-size: 10px;
   background: var(--border);
