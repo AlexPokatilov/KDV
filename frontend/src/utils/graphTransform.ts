@@ -153,6 +153,7 @@ export function toReactFlowGraph(response: GraphResponse): {
       id: e.id,
       source: e.source,
       target: e.target,
+      animated: dashed,
       style: {
         stroke,
         strokeWidth: 1.5,
