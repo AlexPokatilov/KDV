@@ -152,7 +152,9 @@ export function toReactFlowGraph(
     const sourceKind = kindByNodeId.get(e.source)
     const targetKind = kindByNodeId.get(e.target)
     const colorKind =
-      (e.relation === 'uses-config' || e.relation === 'uses-secret') ? targetKind : sourceKind
+      (e.relation === 'uses-config' || e.relation === 'uses-secret' || e.relation === 'mounts' || e.relation === 'bound-to')
+        ? targetKind
+        : sourceKind
     const baseColor = (colorKind && KIND_COLORS[colorKind]) ?? '#64748b'
     const stroke = darkenColor(baseColor, 0.8)
     const dashed = sourceKind === 'Ingress' || sourceKind === 'Service'
