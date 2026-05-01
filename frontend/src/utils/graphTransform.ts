@@ -1,7 +1,8 @@
 import dagre from '@dagrejs/dagre'
-import { MarkerType, Position } from '@xyflow/react'
+import { Position } from '@xyflow/react'
 import type { Edge as RFEdge, Node as RFNode } from '@xyflow/react'
 import type { GraphResponse, ResourceKind } from '../types/graph'
+import { KIND_COLORS } from './kindMeta'
 
 export function filterByKinds(
   response: GraphResponse,
@@ -17,21 +18,6 @@ export function filterByKinds(
 
 const NODE_WIDTH = 200
 const NODE_HEIGHT = 72
-
-function edgeColor(relation: string): string {
-  switch (relation) {
-    case 'routes-to':
-      return '#6366f1'
-    case 'uses-config':
-      return '#ec4899'
-    case 'uses-secret':
-    case 'uses-tls':
-      return '#f43f5e'
-    case 'selects':
-    default:
-      return '#64748b'
-  }
-}
 
 export function applyDagreLayout(
   nodes: RFNode[],
@@ -69,14 +55,16 @@ export function toReactFlowGraph(response: GraphResponse): {
     data: n as unknown as Record<string, unknown>,
   }))
 
+  const kindByNodeId = new Map(response.nodes.map((n) => [n.id, n.kind]))
+
   const edges: RFEdge[] = response.edges.map((e) => {
-    const stroke = edgeColor(e.relation)
+    const sourceKind = kindByNodeId.get(e.source)
+    const stroke = (sourceKind && KIND_COLORS[sourceKind]) ?? '#64748b'
     return {
       id: e.id,
       source: e.source,
       target: e.target,
       animated: e.relation === 'selects',
-      markerEnd: { type: MarkerType.ArrowClosed, color: stroke },
       style: { stroke, strokeWidth: 1.5 },
     }
   })
