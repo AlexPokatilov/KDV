@@ -46,8 +46,14 @@ const nodeTypes: NodeTypes = {
 }
 
 export function GraphView() {
-  const { selectedNamespace, selectedNodeId, visibleKinds, nameFilter, setSelectedNode } =
-    useUIStore()
+  const {
+    selectedNamespace,
+    selectedNodeId,
+    visibleKinds,
+    nameFilter,
+    layoutDirection,
+    setSelectedNode,
+  } = useUIStore()
   const { data, isLoading, isError, error } = useGraphQuery(selectedNamespace)
 
   const [nodes, setNodes, onNodesChange] = useNodesState<RFNode>([])
@@ -56,11 +62,11 @@ export function GraphView() {
   useEffect(() => {
     if (data) {
       const filtered = filterByName(filterByKinds(data, visibleKinds), nameFilter)
-      const { nodes: n, edges: e } = toReactFlowGraph(filtered)
+      const { nodes: n, edges: e } = toReactFlowGraph(filtered, layoutDirection)
       setNodes(n)
       setEdges(e)
     }
-  }, [data, visibleKinds, nameFilter, setNodes, setEdges])
+  }, [data, visibleKinds, nameFilter, layoutDirection, setNodes, setEdges])
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: { id: string }) => {

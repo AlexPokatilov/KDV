@@ -71,7 +71,10 @@ function darkenColor(hex: string, factor: number): string {
   return `#${[r, g, b].map((v) => v.toString(16).padStart(2, '0')).join('')}`
 }
 
-export function toReactFlowGraph(response: GraphResponse): {
+export function toReactFlowGraph(
+  response: GraphResponse,
+  direction: 'TB' | 'LR' = 'TB',
+): {
   nodes: RFNode[]
   edges: RFEdge[]
 } {
@@ -162,7 +165,7 @@ export function toReactFlowGraph(response: GraphResponse): {
     }
   })
 
-  const laidOut = applyDagreLayout(nodes, edges, 'TB', nodeSizes)
+  const laidOut = applyDagreLayout(nodes, edges, direction, nodeSizes)
   return { nodes: laidOut, edges }
 }
 

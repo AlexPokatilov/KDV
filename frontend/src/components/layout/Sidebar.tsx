@@ -17,12 +17,14 @@ export function Sidebar() {
     viewType,
     visibleKinds,
     nameFilter,
+    layoutDirection,
     setNamespace,
     setViewType,
     toggleKind,
     setAllKindsVisible,
     clearKinds,
     setNameFilter,
+    setLayoutDirection,
   } = useUIStore()
   const { data: nsData, isLoading: nsLoading } = useNamespacesQuery()
   const { data: graphData } = useGraphQuery(selectedNamespace)
@@ -85,6 +87,24 @@ export function Sidebar() {
               {!available && <span className="soon-badge">soon</span>}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="sidebar__section">
+        <span className="sidebar__label">Layout</span>
+        <div className="sidebar__view-buttons">
+          <button
+            className={`sidebar__view-btn ${layoutDirection === 'TB' ? 'active' : ''}`}
+            onClick={() => setLayoutDirection('TB')}
+          >
+            Vertical
+          </button>
+          <button
+            className={`sidebar__view-btn ${layoutDirection === 'LR' ? 'active' : ''}`}
+            onClick={() => setLayoutDirection('LR')}
+          >
+            Horizontal
+          </button>
         </div>
       </div>
 
