@@ -39,7 +39,7 @@ export function applyDagreLayout(
   direction: 'TB' | 'LR' = 'TB',
   nodeSizes?: Map<string, { width: number; height: number }>,
   rankSep = 100,
-  nodeSep = 20,
+  nodeSep = 50,
 ): RFNode[] {
   const g = new dagre.graphlib.Graph()
   g.setGraph({ rankdir: direction, ranksep: rankSep, nodesep: nodeSep })
@@ -77,7 +77,7 @@ export function toReactFlowGraph(
   response: GraphResponse,
   direction: 'TB' | 'LR' = 'TB',
   rankSep = 100,
-  nodeSep = 20,
+  nodeSep = 50,
 ): {
   nodes: RFNode[]
   edges: RFEdge[]

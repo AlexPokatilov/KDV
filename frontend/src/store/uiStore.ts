@@ -39,7 +39,7 @@ export const useUIStore = create<UIState>((set) => ({
   nameFilter: '',
   layoutDirection: 'TB',
   rankSep: 100,
-  nodeSep: 20,
+  nodeSep: 50,
   setNamespace: (ns) => set({ selectedNamespace: ns }),
   setViewType: (vt) => set({ viewType: vt }),
   setSelectedNode: (id) => set({ selectedNodeId: id }),
