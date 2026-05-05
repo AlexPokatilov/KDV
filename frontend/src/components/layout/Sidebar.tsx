@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react'
 import { useGraphQuery } from '../../api/graph'
 import { useNamespacesQuery } from '../../api/namespaces'
 import { useUIStore } from '../../store/uiStore'
@@ -33,6 +33,41 @@ export function Sidebar() {
   const { data: nsData, isLoading: nsLoading } = useNamespacesQuery()
   const { data: graphData } = useGraphQuery(selectedNamespace)
 
+  const [sidebarWidth, setSidebarWidth] = useState(220)
+  const isResizing = useRef(false)
+  const startX = useRef(0)
+  const startWidth = useRef(220)
+
+  const handleResizeStart = useCallback((e: React.MouseEvent) => {
+    isResizing.current = true
+    startX.current = e.clientX
+    startWidth.current = sidebarWidth
+    document.body.style.cursor = 'col-resize'
+    document.body.style.userSelect = 'none'
+    e.preventDefault()
+  }, [sidebarWidth])
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isResizing.current) return
+      const delta = e.clientX - startX.current
+      const max = Math.floor(window.innerWidth * 0.3)
+      setSidebarWidth(Math.min(Math.max(startWidth.current + delta, 180), max))
+    }
+    const onMouseUp = () => {
+      if (!isResizing.current) return
+      isResizing.current = false
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseup', onMouseUp)
+    }
+  }, [])
+
   const counts = useMemo(() => {
     const c: Partial<Record<ResourceKind, number>> = {}
     graphData?.nodes.forEach((n) => {
@@ -42,6 +77,7 @@ export function Sidebar() {
   }, [graphData])
 
   return (
+    <div className="sidebar-wrapper" style={{ width: sidebarWidth }}>
     <aside className="sidebar">
       <div className="sidebar__section">
         <label className="sidebar__label" htmlFor="ns-select">
@@ -168,5 +204,7 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    <div className="sidebar__resize-handle" onMouseDown={handleResizeStart} />
+    </div>
   )
 }
