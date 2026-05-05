@@ -62,6 +62,7 @@ export function GraphView() {
     layoutDirection,
     rankSep,
     nodeSep,
+    theme,
     setSelectedNode,
   } = useUIStore()
   const { data, isLoading, isError, error } = useGraphQuery(selectedNamespace)
@@ -108,14 +109,14 @@ export function GraphView() {
         fitView
         fitViewOptions={{ padding: 0.2 }}
       >
-        <Background color="#334155" gap={20} />
+        <Background color={theme === 'dark' ? '#334155' : '#cbd5e1'} gap={20} />
         <Controls />
         <MiniMap
           nodeColor={(n) => {
             const kind = (n.data as unknown as GraphNode)?.kind
             return (kind && KIND_COLORS[kind]) || '#64748b'
           }}
-          maskColor="rgba(15,23,42,0.7)"
+          maskColor={theme === 'dark' ? 'rgba(15,23,42,0.7)' : 'rgba(248,250,252,0.7)'}
         />
       </ReactFlow>
       {selectedNode && <NodeDetailPanel node={selectedNode} />}
