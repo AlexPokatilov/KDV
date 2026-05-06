@@ -73,11 +73,11 @@ export function GraphView() {
   useEffect(() => {
     if (data) {
       const filtered = filterByName(filterByKinds(data, visibleKinds), nameFilter)
-      const { nodes: n, edges: e } = toReactFlowGraph(filtered, layoutDirection, rankSep, nodeSep)
+      const { nodes: n, edges: e } = toReactFlowGraph(filtered, layoutDirection, rankSep, nodeSep, theme)
       setNodes(n)
       setEdges(e)
     }
-  }, [data, visibleKinds, nameFilter, layoutDirection, rankSep, nodeSep, setNodes, setEdges])
+  }, [data, visibleKinds, nameFilter, layoutDirection, rankSep, nodeSep, theme, setNodes, setEdges])
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: { id: string }) => {
