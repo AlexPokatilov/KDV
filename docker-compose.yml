@@ -4,9 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "10000:8000"
+      - "8000:8000"
     volumes:
-      - /opt/kube:/root/.kube:ro
+      - ${HOME}/.kube:/root/.kube:ro
     environment:
       KUBECONFIG: /root/.kube/config
       IN_CLUSTER: "false"
