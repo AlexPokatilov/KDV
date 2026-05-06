@@ -109,14 +109,14 @@ export function GraphView() {
         fitView
         fitViewOptions={{ padding: 0.2 }}
       >
-        <Background color={theme === 'dark' ? '#334155' : '#cbd5e1'} gap={20} />
+        <Background color={theme === 'dark' ? '#334155' : '#b5bbc2'} gap={20} />
         <Controls />
         <MiniMap
           nodeColor={(n) => {
             const kind = (n.data as unknown as GraphNode)?.kind
-            return (kind && KIND_COLORS[kind]) || '#64748b'
+            return (kind && KIND_COLORS[kind]) || '#a5aebb'
           }}
-          maskColor={theme === 'dark' ? 'rgba(15,23,42,0.7)' : 'rgba(248,250,252,0.7)'}
+          maskColor={theme === 'dark' ? 'rgba(15,23,42,0.7)' : 'rgba(187, 187, 187, 0.7)'}
         />
       </ReactFlow>
       {selectedNode && <NodeDetailPanel node={selectedNode} />}
