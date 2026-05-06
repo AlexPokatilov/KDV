@@ -3,7 +3,7 @@ import { useGraphQuery } from '../../api/graph'
 import { useNamespacesQuery } from '../../api/namespaces'
 import { useUIStore } from '../../store/uiStore'
 import type { ResourceKind, ViewType } from '../../types/graph'
-import { ALL_KINDS, KIND_COLORS } from '../../utils/kindMeta'
+import { ALL_KINDS, KIND_COLORS, KIND_LABELS } from '../../utils/kindMeta'
 
 const VIEW_TYPES: { value: ViewType; label: string; available: boolean }[] = [
   { value: 'graph', label: 'Graph', available: true },
@@ -196,7 +196,7 @@ export function Sidebar() {
                   className="legend-dot"
                   style={{ background: KIND_COLORS[kind] }}
                 />
-                <span className="filter-item__name">{kind}</span>
+                <span className="filter-item__name">{KIND_LABELS[kind]}</span>
                 <span className="filter-item__count">{count}</span>
               </label>
             )

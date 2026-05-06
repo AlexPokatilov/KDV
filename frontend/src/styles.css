@@ -353,6 +353,10 @@ body {
   color: var(--text-muted);
 }
 
+[data-theme="light"] .react-flow__background {
+  background: #dde3ec;
+}
+
 /* ─── Graph Container ─────────────────────────────────── */
 
 .graph-container {
