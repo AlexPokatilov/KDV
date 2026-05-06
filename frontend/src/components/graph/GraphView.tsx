@@ -62,6 +62,7 @@ export function GraphView() {
     layoutDirection,
     rankSep,
     nodeSep,
+    theme,
     setSelectedNode,
   } = useUIStore()
   const { data, isLoading, isError, error } = useGraphQuery(selectedNamespace)
@@ -72,11 +73,11 @@ export function GraphView() {
   useEffect(() => {
     if (data) {
       const filtered = filterByName(filterByKinds(data, visibleKinds), nameFilter)
-      const { nodes: n, edges: e } = toReactFlowGraph(filtered, layoutDirection, rankSep, nodeSep)
+      const { nodes: n, edges: e } = toReactFlowGraph(filtered, layoutDirection, rankSep, nodeSep, theme)
       setNodes(n)
       setEdges(e)
     }
-  }, [data, visibleKinds, nameFilter, layoutDirection, rankSep, nodeSep, setNodes, setEdges])
+  }, [data, visibleKinds, nameFilter, layoutDirection, rankSep, nodeSep, theme, setNodes, setEdges])
 
   const onNodeClick = useCallback(
     (_: React.MouseEvent, node: { id: string }) => {
@@ -108,14 +109,14 @@ export function GraphView() {
         fitView
         fitViewOptions={{ padding: 0.2 }}
       >
-        <Background color="#334155" gap={20} />
+        <Background color={theme === 'dark' ? '#334155' : '#b5bbc2'} gap={20} />
         <Controls />
         <MiniMap
           nodeColor={(n) => {
             const kind = (n.data as unknown as GraphNode)?.kind
-            return (kind && KIND_COLORS[kind]) || '#64748b'
+            return (kind && KIND_COLORS[kind]) || '#a5aebb'
           }}
-          maskColor="rgba(15,23,42,0.7)"
+          maskColor={theme === 'dark' ? 'rgba(15,23,42,0.7)' : 'rgba(187, 187, 187, 0.7)'}
         />
       </ReactFlow>
       {selectedNode && <NodeDetailPanel node={selectedNode} />}

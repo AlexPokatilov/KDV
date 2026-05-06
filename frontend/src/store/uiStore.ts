@@ -2,6 +2,9 @@ import { create } from 'zustand'
 import type { ResourceKind, ViewType } from '../types/graph'
 import { ALL_KINDS } from '../utils/kindMeta'
 
+const savedTheme = (localStorage.getItem('kdv-theme') as 'dark' | 'light') ?? 'dark'
+document.documentElement.dataset.theme = savedTheme
+
 type KindVisibility = Record<ResourceKind, boolean>
 
 const allVisible = (): KindVisibility =>
@@ -19,6 +22,7 @@ interface UIState {
   layoutDirection: 'TB' | 'LR'
   rankSep: number
   nodeSep: number
+  theme: 'dark' | 'light'
   setNamespace: (ns: string) => void
   setViewType: (vt: ViewType) => void
   setSelectedNode: (id: string | null) => void
@@ -29,6 +33,7 @@ interface UIState {
   setLayoutDirection: (d: 'TB' | 'LR') => void
   setRankSep: (v: number) => void
   setNodeSep: (v: number) => void
+  toggleTheme: () => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -40,6 +45,7 @@ export const useUIStore = create<UIState>((set) => ({
   layoutDirection: 'TB',
   rankSep: 100,
   nodeSep: 50,
+  theme: savedTheme,
   setNamespace: (ns) => set({ selectedNamespace: ns }),
   setViewType: (vt) => set({ viewType: vt }),
   setSelectedNode: (id) => set({ selectedNodeId: id }),
@@ -53,4 +59,10 @@ export const useUIStore = create<UIState>((set) => ({
   setLayoutDirection: (d) => set({ layoutDirection: d }),
   setRankSep: (v) => set({ rankSep: v }),
   setNodeSep: (v) => set({ nodeSep: v }),
+  toggleTheme: () => set((s) => {
+    const next = s.theme === 'dark' ? 'light' : 'dark'
+    document.documentElement.dataset.theme = next
+    localStorage.setItem('kdv-theme', next)
+    return { theme: next }
+  }),
 }))
