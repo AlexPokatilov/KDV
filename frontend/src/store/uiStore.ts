@@ -23,6 +23,8 @@ interface UIState {
   rankSep: number
   nodeSep: number
   theme: 'dark' | 'light'
+  forceStrength: number
+  forceDistance: number
   setNamespace: (ns: string) => void
   setViewType: (vt: ViewType) => void
   setSelectedNode: (id: string | null) => void
@@ -34,6 +36,8 @@ interface UIState {
   setRankSep: (v: number) => void
   setNodeSep: (v: number) => void
   toggleTheme: () => void
+  setForceStrength: (v: number) => void
+  setForceDistance: (v: number) => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -46,6 +50,8 @@ export const useUIStore = create<UIState>((set) => ({
   rankSep: 100,
   nodeSep: 50,
   theme: savedTheme,
+  forceStrength: -300,
+  forceDistance: 120,
   setNamespace: (ns) => set({ selectedNamespace: ns }),
   setViewType: (vt) => set({ viewType: vt }),
   setSelectedNode: (id) => set({ selectedNodeId: id }),
@@ -59,6 +65,8 @@ export const useUIStore = create<UIState>((set) => ({
   setLayoutDirection: (d) => set({ layoutDirection: d }),
   setRankSep: (v) => set({ rankSep: v }),
   setNodeSep: (v) => set({ nodeSep: v }),
+  setForceStrength: (v) => set({ forceStrength: v }),
+  setForceDistance: (v) => set({ forceDistance: v }),
   toggleTheme: () => set((s) => {
     const next = s.theme === 'dark' ? 'light' : 'dark'
     document.documentElement.dataset.theme = next

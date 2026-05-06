@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.45.0",
-    "@xyflow/react": "^12.3.0",
     "@dagrejs/dagre": "^1.1.4",
+    "@tanstack/react-query": "^5.45.0",
+    "@types/d3-force": "^3.0.10",
+    "@xyflow/react": "^12.3.0",
     "axios": "^1.7.0",
+    "d3-force": "^3.0.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-icons": "^5.2.0",

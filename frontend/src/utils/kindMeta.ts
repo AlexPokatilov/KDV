@@ -30,6 +30,21 @@ export const KIND_LABELS: Record<ResourceKind, string> = {
   PersistentVolume: 'PV',
 }
 
+export const KIND_SHORT_LABELS: Record<ResourceKind, string> = {
+  Deployment: 'D',
+  StatefulSet: 'STS',
+  DaemonSet: 'DS',
+  Pod: 'PO',
+  Job: 'J',
+  CronJob: 'CJ',
+  Service: 'SVC',
+  Ingress: 'ING',
+  ConfigMap: 'CM',
+  Secret: 'S',
+  PersistentVolumeClaim: 'PVC',
+  PersistentVolume: 'PV',
+}
+
 export const ALL_KINDS: ResourceKind[] = [
   'Ingress',
   'Service',

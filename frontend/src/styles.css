@@ -982,3 +982,64 @@ body {
   color: var(--text-primary);
   border-color: var(--text-muted);
 }
+
+/* ─── Bubbles View ────────────────────────────────────── */
+
+.bubbles-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.bubbles-container--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.bubbles-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+
+.bubbles-svg:active {
+  cursor: grabbing;
+}
+
+.bubble {
+  cursor: pointer;
+}
+
+.bubble__circle {
+  stroke-width: 2;
+  transition: stroke-width 0.15s;
+}
+
+.bubble--selected .bubble__circle,
+.bubble:hover .bubble__circle {
+  stroke-width: 4;
+}
+
+.bubble__abbr {
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  fill: var(--text-primary);
+}
+
+.bubble__name {
+  font-size: 10px;
+  text-anchor: middle;
+  pointer-events: none;
+  fill: var(--text-secondary);
+}
+
+.bubble-edge {
+  fill: none;
+}
