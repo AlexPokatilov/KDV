@@ -157,7 +157,7 @@ export function toReactFlowGraph(
         ? targetKind
         : sourceKind
     const baseColor = (colorKind && KIND_COLORS[colorKind]) ?? '#64748b'
-    const stroke = scaleColor(baseColor, theme === 'light' ? 1.2 : 0.8)
+    const stroke = scaleColor(baseColor, theme === 'light' ? 1.0 : 0.8)
     const dashed = sourceKind === 'Ingress' || sourceKind === 'Service'
     return {
       id: e.id,
