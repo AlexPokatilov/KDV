@@ -254,13 +254,31 @@ export function BubblesView() {
     )
   }
 
+  const DOT_GAP = 20
+  const dotColor = theme === 'dark' ? '#334155' : '#cbd5e1'
+  const patternSize = DOT_GAP * transform.k
+  const patternX = ((transform.x % patternSize) + patternSize) % patternSize
+  const patternY = ((transform.y % patternSize) + patternSize) % patternSize
+
   return (
     <div className="bubbles-container" ref={containerRef}>
       <svg ref={svgRef} className="bubbles-svg" onWheel={handleWheel}>
+        <defs>
+          <pattern
+            id="bubbles-dots"
+            x={patternX}
+            y={patternY}
+            width={patternSize}
+            height={patternSize}
+            patternUnits="userSpaceOnUse"
+          >
+            <circle cx={patternSize / 2} cy={patternSize / 2} r={1.5} fill={dotColor} />
+          </pattern>
+        </defs>
         <rect
           width="100%"
           height="100%"
-          fill="transparent"
+          fill="url(#bubbles-dots)"
           onMouseDown={handleBgMouseDown}
           onClick={handleBgClick}
         />
