@@ -272,7 +272,7 @@ export function BubblesView() {
             height={patternSize}
             patternUnits="userSpaceOnUse"
           >
-            <circle cx={patternSize / 2} cy={patternSize / 2} r={1.5 * transform.k} fill={dotColor} />
+            <circle cx={transform.k / 2} cy={transform.k / 2} r={transform.k / 2} fill={dotColor} />
           </pattern>
         </defs>
         <rect
