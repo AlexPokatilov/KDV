@@ -51,7 +51,7 @@ export const useUIStore = create<UIState>((set) => ({
   nodeSep: 50,
   theme: savedTheme,
   forceStrength: -300,
-  forceDistance: 120,
+  forceDistance: 150,
   setNamespace: (ns) => set({ selectedNamespace: ns }),
   setViewType: (vt) => set({ viewType: vt }),
   setSelectedNode: (id) => set({ selectedNodeId: id }),
