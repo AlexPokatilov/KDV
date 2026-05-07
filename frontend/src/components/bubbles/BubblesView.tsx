@@ -16,6 +16,8 @@ import type { GraphNode, GraphEdge } from '../../types/graph'
 import type { ResourceKind } from '../../types/graph'
 
 const RADIUS = 28
+const MINIMAP_W = 200
+const MINIMAP_H = 120
 
 interface SimNode extends SimulationNodeDatum {
   id: string
@@ -54,6 +56,9 @@ export function BubblesView() {
 
   const [transform, setTransform] = useState<Transform>({ x: 0, y: 0, k: 1 })
   const transformRef = useRef<Transform>({ x: 0, y: 0, k: 1 })
+
+  const minimapNodeRefs = useRef<Map<string, SVGCircleElement>>(new Map())
+  const minimapBoundsRef = useRef({ scale: 1, offsetX: 0, offsetY: 0 })
 
   const isPanning = useRef(false)
   const panStart = useRef({ x: 0, y: 0, tx: 0, ty: 0 })
@@ -125,6 +130,27 @@ export function BubblesView() {
           el.setAttribute('y1', String(s.y ?? 0))
           el.setAttribute('x2', String(t.x ?? 0))
           el.setAttribute('y2', String(t.y ?? 0))
+        }
+      })
+
+      // Update minimap bounds and node positions
+      const xs = simNodes.filter((n) => n.x != null).map((n) => n.x!)
+      const ys = simNodes.filter((n) => n.y != null).map((n) => n.y!)
+      if (xs.length > 0) {
+        const pad = RADIUS + 10
+        const minX = Math.min(...xs) - pad
+        const maxX = Math.max(...xs) + pad
+        const minY = Math.min(...ys) - pad
+        const maxY = Math.max(...ys) + pad
+        const scale = Math.min(MINIMAP_W / (maxX - minX), MINIMAP_H / (maxY - minY))
+        minimapBoundsRef.current = { scale, offsetX: -minX, offsetY: -minY }
+      }
+      simNodes.forEach((n) => {
+        const el = minimapNodeRefs.current.get(n.id)
+        if (el && n.x != null && n.y != null) {
+          const { scale, offsetX, offsetY } = minimapBoundsRef.current
+          el.setAttribute('cx', String((n.x + offsetX) * scale))
+          el.setAttribute('cy', String((n.y + offsetY) * scale))
         }
       })
     })
@@ -238,6 +264,48 @@ export function BubblesView() {
     setSelectedNode(null)
   }, [setSelectedNode])
 
+  const zoomAround = useCallback((factor: number) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    const cx = (rect?.width ?? 800) / 2
+    const cy = (rect?.height ?? 600) / 2
+    const { x, y, k } = transformRef.current
+    const newK = Math.min(Math.max(k * factor, 0.2), 4)
+    const next = {
+      x: cx - (cx - x) * (newK / k),
+      y: cy - (cy - y) * (newK / k),
+      k: newK,
+    }
+    transformRef.current = next
+    setTransform(next)
+  }, [])
+
+  const handleZoomIn = useCallback(() => zoomAround(1.3), [zoomAround])
+  const handleZoomOut = useCallback(() => zoomAround(1 / 1.3), [zoomAround])
+
+  const handleFitView = useCallback(() => {
+    const nodes = simRef.current?.nodes()
+    if (!nodes?.length) return
+    const rect = containerRef.current?.getBoundingClientRect()
+    const W = rect?.width ?? 800
+    const H = rect?.height ?? 600
+    const xs = nodes.filter((n) => n.x != null).map((n) => n.x!)
+    const ys = nodes.filter((n) => n.y != null).map((n) => n.y!)
+    if (!xs.length) return
+    const pad = RADIUS + 20
+    const minX = Math.min(...xs) - pad
+    const maxX = Math.max(...xs) + pad
+    const minY = Math.min(...ys) - pad
+    const maxY = Math.max(...ys) + pad
+    const k = Math.min(W / (maxX - minX), H / (maxY - minY), 4)
+    const next = {
+      x: W / 2 - ((minX + maxX) / 2) * k,
+      y: H / 2 - ((minY + maxY) / 2) * k,
+      k,
+    }
+    transformRef.current = next
+    setTransform(next)
+  }, [])
+
   if (isLoading) {
     return (
       <div className="bubbles-container bubbles-container--center">
@@ -329,6 +397,51 @@ export function BubblesView() {
         </g>
       </svg>
       {selectedNode && <NodeDetailPanel node={selectedNode} />}
+
+      <div className="bubbles-controls">
+        <button className="bubbles-controls__btn" onClick={handleZoomIn} title="Zoom in">+</button>
+        <button className="bubbles-controls__btn" onClick={handleZoomOut} title="Zoom out">−</button>
+        <button className="bubbles-controls__btn" onClick={handleFitView} title="Fit view">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+            <path d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM1 10h2v3h3v2H1v-5zm12 3h-3v2h5v-5h-2v3z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div className="bubbles-minimap">
+        <svg width={MINIMAP_W} height={MINIMAP_H}>
+          {filtered.nodes.map((n) => (
+            <circle
+              key={n.id}
+              ref={(el) => {
+                if (el) minimapNodeRefs.current.set(n.id, el)
+                else minimapNodeRefs.current.delete(n.id)
+              }}
+              r={4}
+              fill={KIND_COLORS[n.kind]}
+              opacity={0.85}
+            />
+          ))}
+          {(() => {
+            const { scale: mms, offsetX: mmox, offsetY: mmoy } = minimapBoundsRef.current
+            const rect = containerRef.current?.getBoundingClientRect()
+            const W = rect?.width ?? 800
+            const H = rect?.height ?? 600
+            return (
+              <rect
+                x={(-transform.x / transform.k + mmox) * mms}
+                y={(-transform.y / transform.k + mmoy) * mms}
+                width={(W / transform.k) * mms}
+                height={(H / transform.k) * mms}
+                fill={theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
+                stroke={theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'}
+                strokeWidth={1}
+                rx={2}
+              />
+            )
+          })()}
+        </svg>
+      </div>
     </div>
   )
 }
