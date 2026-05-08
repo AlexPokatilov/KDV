@@ -7,7 +7,7 @@ import { ALL_KINDS, KIND_COLORS, KIND_LABELS } from '../../utils/kindMeta'
 
 const VIEW_TYPES: { value: ViewType; label: string; available: boolean }[] = [
   { value: 'graph', label: 'Graph', available: true },
-  { value: 'bubbles', label: 'Bubbles', available: false },
+  { value: 'bubbles', label: 'Bubbles', available: true },
   { value: 'table', label: 'Table', available: false },
 ]
 
@@ -20,6 +20,8 @@ export function Sidebar() {
     layoutDirection,
     rankSep,
     nodeSep,
+    forceStrength,
+    forceDistance,
     setNamespace,
     setViewType,
     toggleKind,
@@ -29,6 +31,8 @@ export function Sidebar() {
     setLayoutDirection,
     setRankSep,
     setNodeSep,
+    setForceStrength,
+    setForceDistance,
   } = useUIStore()
   const { data: nsData, isLoading: nsLoading } = useNamespacesQuery()
   const { data: graphData } = useGraphQuery(selectedNamespace)
@@ -130,41 +134,67 @@ export function Sidebar() {
         </div>
       </div>
 
-      <div className="sidebar__section">
-        <span className="sidebar__label">Layout</span>
-        <div className="sidebar__view-buttons">
-          <button
-            className={`sidebar__view-btn ${layoutDirection === 'TB' ? 'active' : ''}`}
-            onClick={() => setLayoutDirection('TB')}
-          >
-            Vertical
-          </button>
-          <button
-            className={`sidebar__view-btn ${layoutDirection === 'LR' ? 'active' : ''}`}
-            onClick={() => setLayoutDirection('LR')}
-          >
-            Horizontal
-          </button>
+      {viewType === 'graph' && (
+        <div className="sidebar__section">
+          <span className="sidebar__label">Layout</span>
+          <div className="sidebar__view-buttons">
+            <button
+              className={`sidebar__view-btn ${layoutDirection === 'TB' ? 'active' : ''}`}
+              onClick={() => setLayoutDirection('TB')}
+            >
+              Vertical
+            </button>
+            <button
+              className={`sidebar__view-btn ${layoutDirection === 'LR' ? 'active' : ''}`}
+              onClick={() => setLayoutDirection('LR')}
+            >
+              Horizontal
+            </button>
+          </div>
+          <div className="sidebar__spacing">
+            <label className="sidebar__spacing-label">
+              <span>Rank gap</span><span>{rankSep}</span>
+            </label>
+            <input
+              type="range" min={60} max={500} step={20}
+              value={rankSep}
+              onChange={(e) => setRankSep(+e.target.value)}
+            />
+            <label className="sidebar__spacing-label">
+              <span>Node gap</span><span>{nodeSep}</span>
+            </label>
+            <input
+              type="range" min={20} max={200} step={10}
+              value={nodeSep}
+              onChange={(e) => setNodeSep(+e.target.value)}
+            />
+          </div>
         </div>
-        <div className="sidebar__spacing">
-          <label className="sidebar__spacing-label">
-            <span>Rank gap</span><span>{rankSep}</span>
-          </label>
-          <input
-            type="range" min={60} max={500} step={20}
-            value={rankSep}
-            onChange={(e) => setRankSep(+e.target.value)}
-          />
-          <label className="sidebar__spacing-label">
-            <span>Node gap</span><span>{nodeSep}</span>
-          </label>
-          <input
-            type="range" min={20} max={200} step={10}
-            value={nodeSep}
-            onChange={(e) => setNodeSep(+e.target.value)}
-          />
+      )}
+
+      {viewType === 'bubbles' && (
+        <div className="sidebar__section">
+          <span className="sidebar__label">Force</span>
+          <div className="sidebar__spacing">
+            <label className="sidebar__spacing-label">
+              <span>Strength</span><span>{forceStrength}</span>
+            </label>
+            <input
+              type="range" min={-600} max={-50} step={10}
+              value={forceStrength}
+              onChange={(e) => setForceStrength(+e.target.value)}
+            />
+            <label className="sidebar__spacing-label">
+              <span>Distance</span><span>{forceDistance}</span>
+            </label>
+            <input
+              type="range" min={50} max={400} step={10}
+              value={forceDistance}
+              onChange={(e) => setForceDistance(+e.target.value)}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="sidebar__section">
         <div className="sidebar__filter-header">

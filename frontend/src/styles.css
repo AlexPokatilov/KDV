@@ -982,3 +982,124 @@ body {
   color: var(--text-primary);
   border-color: var(--text-muted);
 }
+
+/* ─── Bubbles View ────────────────────────────────────── */
+
+.bubbles-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-base);
+}
+
+[data-theme="light"] .bubbles-container {
+  background: #dde3ec;
+}
+
+.bubbles-container--center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+.bubbles-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+
+.bubbles-svg:active {
+  cursor: grabbing;
+}
+
+.bubble {
+  cursor: pointer;
+}
+
+.bubble__circle {
+  stroke-width: 2;
+  transition: stroke-width 0.15s;
+}
+
+.bubble--selected .bubble__circle,
+.bubble:hover .bubble__circle {
+  stroke-width: 4;
+}
+
+.bubble__abbr {
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+  fill: var(--text-primary);
+}
+
+.bubble__name {
+  font-size: 10px;
+  text-anchor: middle;
+  pointer-events: none;
+  fill: var(--text-secondary);
+}
+
+.bubble-edge {
+  fill: none;
+}
+
+/* ─── Bubbles Controls ────────────────────────────────── */
+
+.bubbles-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  overflow: hidden;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
+}
+
+.bubbles-controls__btn {
+  width: 26px;
+  height: 26px;
+  padding: 4px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bubbles-controls__btn:hover {
+  background: var(--bg-elevated);
+}
+
+.bubbles-controls__btn:last-child {
+  border-bottom: none;
+}
+
+/* ─── Bubbles MiniMap ─────────────────────────────────── */
+
+.bubbles-minimap {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-surface);
+  z-index: 10;
+}
+
+.bubbles-minimap svg {
+  display: block;
+}

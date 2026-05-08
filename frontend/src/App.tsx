@@ -3,6 +3,7 @@ import { useUIStore } from './store/uiStore'
 import { Header } from './components/layout/Header'
 import { Sidebar } from './components/layout/Sidebar'
 import { GraphView } from './components/graph/GraphView'
+import { BubblesView } from './components/bubbles/BubblesView'
 import './styles.css'
 
 const queryClient = new QueryClient()
@@ -17,6 +18,7 @@ function AppContent() {
         <Sidebar />
         <main className="app__main">
           {viewType === 'graph' && <GraphView />}
+          {viewType === 'bubbles' && <BubblesView />}
         </main>
       </div>
     </div>
