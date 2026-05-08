@@ -1057,30 +1057,34 @@ body {
   left: 16px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
   z-index: 10;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  overflow: hidden;
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.08);
 }
 
 .bubbles-controls__btn {
   width: 26px;
   height: 26px;
-  border: 1px solid var(--border);
+  padding: 4px;
+  border: none;
+  border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
-  color: var(--text-primary);
-  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  line-height: 1;
-  padding: 0;
-  transition: background 0.15s;
-  box-shadow: 0 1px 4px var(--shadow-panel);
 }
 
 .bubbles-controls__btn:hover {
   background: var(--bg-elevated);
+}
+
+.bubbles-controls__btn:last-child {
+  border-bottom: none;
 }
 
 /* ─── Bubbles MiniMap ─────────────────────────────────── */
@@ -1093,13 +1097,7 @@ body {
   border-radius: var(--radius);
   overflow: hidden;
   background: var(--bg-surface);
-  box-shadow: 0 2px 8px var(--shadow-panel);
   z-index: 10;
-  opacity: 0.9;
-}
-
-.bubbles-minimap:hover {
-  opacity: 1;
 }
 
 .bubbles-minimap svg {

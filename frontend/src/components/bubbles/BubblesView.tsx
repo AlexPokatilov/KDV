@@ -399,10 +399,18 @@ export function BubblesView() {
       {selectedNode && <NodeDetailPanel node={selectedNode} />}
 
       <div className="bubbles-controls">
-        <button className="bubbles-controls__btn" onClick={handleZoomIn} title="Zoom in">+</button>
-        <button className="bubbles-controls__btn" onClick={handleZoomOut} title="Zoom out">−</button>
+        <button className="bubbles-controls__btn" onClick={handleZoomIn} title="Zoom in">
+          <svg viewBox="0 0 12 12" width="12" height="12" fill="currentColor">
+            <path d="M5 0h2v5h5v2H7v5H5V7H0V5h5z"/>
+          </svg>
+        </button>
+        <button className="bubbles-controls__btn" onClick={handleZoomOut} title="Zoom out">
+          <svg viewBox="0 0 12 2" width="12" height="2" fill="currentColor">
+            <rect width="12" height="2"/>
+          </svg>
+        </button>
         <button className="bubbles-controls__btn" onClick={handleFitView} title="Fit view">
-          <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
             <path d="M1 1h5v2H3v3H1V1zm9 0h5v5h-2V3h-3V1zM1 10h2v3h3v2H1v-5zm12 3h-3v2h5v-5h-2v3z"/>
           </svg>
         </button>
@@ -427,17 +435,26 @@ export function BubblesView() {
             const rect = containerRef.current?.getBoundingClientRect()
             const W = rect?.width ?? 800
             const H = rect?.height ?? 600
+            const vpX = (-transform.x / transform.k + mmox) * mms
+            const vpY = (-transform.y / transform.k + mmoy) * mms
+            const vpW = (W / transform.k) * mms
+            const vpH = (H / transform.k) * mms
+            const maskColor = theme === 'dark' ? 'rgba(15,23,42,0.7)' : 'rgba(187,187,187,0.7)'
             return (
-              <rect
-                x={(-transform.x / transform.k + mmox) * mms}
-                y={(-transform.y / transform.k + mmoy) * mms}
-                width={(W / transform.k) * mms}
-                height={(H / transform.k) * mms}
-                fill={theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}
-                stroke={theme === 'dark' ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.25)'}
-                strokeWidth={1}
-                rx={2}
-              />
+              <>
+                <defs>
+                  <mask id="bubbles-minimap-mask">
+                    <rect width={MINIMAP_W} height={MINIMAP_H} fill="white" />
+                    <rect x={vpX} y={vpY} width={vpW} height={vpH} fill="black" />
+                  </mask>
+                </defs>
+                <rect
+                  width={MINIMAP_W}
+                  height={MINIMAP_H}
+                  fill={maskColor}
+                  mask="url(#bubbles-minimap-mask)"
+                />
+              </>
             )
           })()}
         </svg>
