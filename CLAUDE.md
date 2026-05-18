@@ -13,19 +13,52 @@ KDV (Kubernetes Dependency Viewer) is a full-stack application:
 
 > These steps are **required** and must not be skipped.
 
-### 1. Code Review
+### 1. Automated Checks (must all pass)
+
+Run these locally before opening a PR — CI enforces them too:
+
+```bash
+# Backend
+cd backend
+pip install -r requirements.txt -r requirements-dev.txt
+ruff check .
+ruff format --check .
+pytest tests/ -v
+
+# Frontend
+cd frontend
+npm install
+npm run type-check
+npm run lint
+npm run test
+```
+
+> All four commands must exit 0. A failing test or lint error blocks the merge.
+
+### 2. Documentation Update
+
+Every PR that adds, removes, or changes user-visible behaviour **must** update the relevant docs before merge:
+
+- [ ] `README.md` — Features list, Supported Resource Types table, Tracked Relationships table, API Reference, Configuration table, and Project Structure tree are all accurate
+- [ ] `CLAUDE.md` — Development Standards section reflects any new conventions introduced by the PR (new factories, new store fields, new route patterns, etc.)
+- [ ] `.env.example` — any new environment variable is documented with its default and a one-line description
+- [ ] In-code comments — public functions/helpers that change signature or behaviour have updated doc comments (or none if self-explanatory)
+
+> "Up to date" means a reader unfamiliar with the PR can understand the feature solely from the docs — no cross-referencing the diff required.
+
+### 3. Code Review
 
 - Every PR targeting `main` must be reviewed before merge — do not self-merge without review
 - Review checklist:
-  - [ ] No TypeScript errors (`npm run build` passes in `frontend/`)
-  - [ ] No Python lint errors (`ruff check backend/` passes)
+  - [ ] Automated checks pass (see above)
+  - [ ] Documentation updated (see above)
   - [ ] No hardcoded secrets, credentials, or cluster-specific values
   - [ ] CSS class names follow BEM convention used in the project
   - [ ] New components reuse existing utilities (`filterByKinds`, `computeEdgeStroke`, `KIND_COLORS`, etc.) — no duplication
   - [ ] Loading and error states use `<LoadingSpinner>` and `<ErrorBanner>` (not inline markup)
   - [ ] Node components use the `makeK8sNode` / `makeGroupNode` factories in `K8sNode.tsx` / `GroupNode.tsx`
 
-### 2. Service Testing
+### 4. Service Testing
 
 Before merging or releasing, manually verify the running service:
 
@@ -52,14 +85,13 @@ Before merging or releasing, manually verify the running service:
 - [ ] Sidebar is resizable
 
 **Build**
-- [ ] `npm run build` in `frontend/` produces no TypeScript errors
 - [ ] `docker build .` from repo root completes successfully
 
-### 3. Before a Release Tag
+### 5. Before a Release Tag
 
-In addition to the above:
-- [ ] `Chart.yaml` `version` and `appVersion` in `helm/kdv/` reflect the release version OR confirm the CI workflow sets them dynamically from the tag (current behaviour)
-- [ ] `README.md` is up to date with any new features or changed configuration
+In addition to all of the above:
+- [ ] `README.md` reflects the final state of the release (features, config, API)
+- [ ] `Chart.yaml` `version` and `appVersion` in `helm/kdv/` match the release tag OR confirm the CI workflow sets them dynamically (current behaviour)
 - [ ] The release tag follows the `MAJOR.MINOR.PATCH` format (e.g. `1.3.0`)
 
 ---
@@ -79,7 +111,9 @@ In addition to the above:
 - API routes → `backend/app/routers/`
 - New resource types → extend `backend/app/services/dependency_resolver.py`
 - Pydantic models → `backend/app/models/graph.py`
+- All K8s API calls must be wrapped with `try/except ApiException` via `_raise_for_k8s_error()` in `k8s_client.py`
 - Run linter before committing: `ruff check backend/`
+- Run tests before committing: `pytest backend/tests/ -v`
 
 ### Git
 
@@ -94,7 +128,7 @@ In addition to the above:
 | Workflow | Trigger | What it does |
 |---|---|---|
 | `build.yml` | push / PR | Docker build check |
-| `lint.yml` | push / PR | Python ruff + frontend tsc |
+| `lint.yml` | push / PR | Python ruff + pytest + frontend tsc + eslint + vitest |
 | `hadolint.yml` | push / PR | Dockerfile lint |
 | `codeql.yml` | push / PR / schedule | Security scanning |
 | `release.yml` | GitHub Release published | Docker push to Hub + Helm chart publish |
