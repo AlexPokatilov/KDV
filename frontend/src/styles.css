@@ -6,6 +6,7 @@
 
 :root {
   --bg-base: #0f172a;
+  --bg-canvas: var(--bg-base);
   --bg-surface: #1e293b;
   --bg-elevated: #273549;
   --border: #334155;
@@ -33,6 +34,7 @@
 
 [data-theme="light"] {
   --bg-base: #f8fafc;
+  --bg-canvas: #dde3ec;
   --bg-surface: #ffffff;
   --bg-elevated: #f1f5f9;
   --border: #e2e8f0;
@@ -353,10 +355,6 @@ body {
   color: var(--text-muted);
 }
 
-[data-theme="light"] .react-flow__background {
-  background: #dde3ec;
-}
-
 /* ─── Graph Container ─────────────────────────────────── */
 
 .graph-container {
@@ -366,7 +364,7 @@ body {
 }
 
 .react-flow__background {
-  background: var(--bg-base);
+  background: var(--bg-canvas);
 }
 
 /* ─── K8s Nodes ───────────────────────────────────────── */
@@ -990,18 +988,7 @@ body {
   height: 100%;
   position: relative;
   overflow: hidden;
-  background: var(--bg-base);
-}
-
-[data-theme="light"] .bubbles-container {
-  background: #dde3ec;
-}
-
-.bubbles-container--center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
+  background: var(--bg-canvas);
 }
 
 .bubbles-svg {

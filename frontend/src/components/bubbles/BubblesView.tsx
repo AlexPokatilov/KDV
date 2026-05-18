@@ -11,9 +11,10 @@ import { useGraphQuery } from '../../api/graph'
 import { useUIStore } from '../../store/uiStore'
 import { filterByKinds, filterByName, computeEdgeStroke } from '../../utils/graphTransform'
 import { KIND_COLORS, KIND_SHORT_LABELS } from '../../utils/kindMeta'
+import { ErrorBanner } from '../common/ErrorBanner'
+import { LoadingSpinner } from '../common/LoadingSpinner'
 import { NodeDetailPanel } from '../graph/NodeDetailPanel'
-import type { GraphNode, GraphEdge } from '../../types/graph'
-import type { ResourceKind } from '../../types/graph'
+import type { GraphNode, GraphEdge, ResourceKind } from '../../types/graph'
 
 const RADIUS = 28
 const MINIMAP_W = 200
@@ -46,7 +47,7 @@ export function BubblesView() {
     forceDistance,
   } = useUIStore()
 
-  const { data, isLoading, isError } = useGraphQuery(selectedNamespace)
+  const { data, isLoading, isError, error } = useGraphQuery(selectedNamespace)
 
   const containerRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -306,21 +307,8 @@ export function BubblesView() {
     setTransform(next)
   }, [])
 
-  if (isLoading) {
-    return (
-      <div className="bubbles-container bubbles-container--center">
-        <span>Loading…</span>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div className="bubbles-container bubbles-container--center">
-        <span>Error loading graph</span>
-      </div>
-    )
-  }
+  if (isLoading) return <LoadingSpinner />
+  if (isError) return <ErrorBanner message={(error as Error)?.message ?? 'Error loading graph'} />
 
   const DOT_GAP = 20
   const dotColor = theme === 'dark' ? '#334155' : '#cbd5e1'

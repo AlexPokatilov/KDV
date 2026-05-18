@@ -19,21 +19,12 @@ import { KIND_COLORS } from '../../utils/kindMeta'
 import { ErrorBanner } from '../common/ErrorBanner'
 import { LoadingSpinner } from '../common/LoadingSpinner'
 import { NodeDetailPanel } from './NodeDetailPanel'
-import { ConfigMapGroupNode } from './nodes/ConfigMapGroupNode'
-import { ConfigMapNode } from './nodes/ConfigMapNode'
-import { CronJobNode } from './nodes/CronJobNode'
-import { DaemonSetNode } from './nodes/DaemonSetNode'
-import { DeploymentNode } from './nodes/DeploymentNode'
-import { IngressNode } from './nodes/IngressNode'
-import { JobNode } from './nodes/JobNode'
-import { PodGroupNode } from './nodes/PodGroupNode'
-import { PVCNode } from './nodes/PVCNode'
-import { PVNode } from './nodes/PVNode'
-import { PodNode } from './nodes/PodNode'
-import { SecretGroupNode } from './nodes/SecretGroupNode'
-import { SecretNode } from './nodes/SecretNode'
-import { ServiceNode } from './nodes/ServiceNode'
-import { StatefulSetNode } from './nodes/StatefulSetNode'
+import {
+  ConfigMapNode, CronJobNode, DaemonSetNode, DeploymentNode,
+  IngressNode, JobNode, PodNode, PVCNode, PVNode,
+  SecretNode, ServiceNode, StatefulSetNode,
+} from './nodes/K8sNode'
+import { ConfigMapGroupNode, PodGroupNode, SecretGroupNode } from './nodes/GroupNode'
 
 const nodeTypes: NodeTypes = {
   pod: PodNode,
