@@ -35,18 +35,30 @@ npm run test
 
 > All four commands must exit 0. A failing test or lint error blocks the merge.
 
-### 2. Code Review
+### 2. Documentation Update
+
+Every PR that adds, removes, or changes user-visible behaviour **must** update the relevant docs before merge:
+
+- [ ] `README.md` — Features list, Supported Resource Types table, Tracked Relationships table, API Reference, Configuration table, and Project Structure tree are all accurate
+- [ ] `CLAUDE.md` — Development Standards section reflects any new conventions introduced by the PR (new factories, new store fields, new route patterns, etc.)
+- [ ] `.env.example` — any new environment variable is documented with its default and a one-line description
+- [ ] In-code comments — public functions/helpers that change signature or behaviour have updated doc comments (or none if self-explanatory)
+
+> "Up to date" means a reader unfamiliar with the PR can understand the feature solely from the docs — no cross-referencing the diff required.
+
+### 3. Code Review
 
 - Every PR targeting `main` must be reviewed before merge — do not self-merge without review
 - Review checklist:
   - [ ] Automated checks pass (see above)
+  - [ ] Documentation updated (see above)
   - [ ] No hardcoded secrets, credentials, or cluster-specific values
   - [ ] CSS class names follow BEM convention used in the project
   - [ ] New components reuse existing utilities (`filterByKinds`, `computeEdgeStroke`, `KIND_COLORS`, etc.) — no duplication
   - [ ] Loading and error states use `<LoadingSpinner>` and `<ErrorBanner>` (not inline markup)
   - [ ] Node components use the `makeK8sNode` / `makeGroupNode` factories in `K8sNode.tsx` / `GroupNode.tsx`
 
-### 3. Service Testing
+### 4. Service Testing
 
 Before merging or releasing, manually verify the running service:
 
@@ -75,11 +87,11 @@ Before merging or releasing, manually verify the running service:
 **Build**
 - [ ] `docker build .` from repo root completes successfully
 
-### 4. Before a Release Tag
+### 5. Before a Release Tag
 
-In addition to the above:
-- [ ] `Chart.yaml` `version` and `appVersion` in `helm/kdv/` reflect the release version OR confirm the CI workflow sets them dynamically from the tag (current behaviour)
-- [ ] `README.md` is up to date with any new features or changed configuration
+In addition to all of the above:
+- [ ] `README.md` reflects the final state of the release (features, config, API)
+- [ ] `Chart.yaml` `version` and `appVersion` in `helm/kdv/` match the release tag OR confirm the CI workflow sets them dynamically (current behaviour)
 - [ ] The release tag follows the `MAJOR.MINOR.PATCH` format (e.g. `1.3.0`)
 
 ---
