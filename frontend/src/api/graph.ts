@@ -7,7 +7,7 @@ export function useGraphQuery(namespace: string) {
     queryKey: ['graph', namespace],
     queryFn: () =>
       apiClient
-        .get<GraphResponse>(`/api/graph?namespace=${namespace}`)
+        .get<GraphResponse>('/api/graph', { params: { namespace } })
         .then((r) => r.data),
     staleTime: 30_000,
     refetchInterval: 60_000,
